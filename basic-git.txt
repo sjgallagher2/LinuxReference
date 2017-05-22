@@ -78,6 +78,38 @@ git internally. To do that, you use:
 	$ gitk
 This is a visual git program that runs with KDE (or GTK, not sure)
 
+Now I've made a bunch of changes to the repo, and I want to commit these changes to the branch, and 
+suggest to the owner that we merge my branch with the Master branch. First, I add the files that I've
+changed:
+	$ git add myfile.txt
+Or
+	$ git add --all
+Now I can commit, with a message. This is recommended so people know what's been changed, at a glance. 
+	$ git commit -m "Initial commit uploaded all files."
+You can bypass the git add command by automatically adding files that have changed with:
+	$ git commit -a -m "Initial commit"
+The reason we need to do all this is because the repository is handled, by git, in a way that you have
+local uncommitted files, local committed files, and shared committed files. The git add command adds
+files to the "commit queue" if you will, those files will be commited. Then you actually locally commit
+the files, and your local repository will permanently reflect these changes. This is actually great,
+because it means if you do not want to keep the changes, you simply don't commit the files. 
+You can do this two ways, the first is probably the simplest: 
+	$ git checkout -- .				Remove all unstaged changes
+This is
+done with:
+	$ git clean -nd			Preview changes
+	$ git clean --hard		Remove all uncommitted (staged and unstaged) files
+	$ git clean -fd			Remove untracked files and directories
+On the other hand, when you want to update your remote repo (like on github) we run:
+	$ git push -u origin master
+In all likelihood, you'll want to work outside of the main branch, and rarely will you actually push
+directly to it. At least, for projects you are doing with other people. Instead, you create a pull
+request, and then you merge the pull request. The pull request consists of your branch that you'd
+like to merge into the master, and it lets people comment on the commits you made to that branch and
+make commits of their own so that you can all verify that it's good and safe to merge. The command
+exists in git as "git request-pull", but this is different from the GitHub pull request detailed here. 
+
+
 Finally, software is typically released as a .tar.gz file, which is a zip format. To make a release using
 one of the versions of your project as a .tar.gz, you can run:
 	$ git archive -o booksmart1.5.7.tar.gz master
