@@ -1,0 +1,19 @@
+Screen is a simple program but it has a learning curve. Here's how to work it:
+Type in 'screen' to start the whole thing up.
+Use 'ctrl+a' and then a letter to do commands. 
+To open a new window, use ctrl+a c
+To go to the next window use ctrl+a n
+For a specific screen, use ctrl+a and a number, like ctrl+a 2,
+where the number is the screen number you want to use.
+You can list all the windows by using ctrl+a w
+Then split the screen left-right using ctrl+a |, or split
+the screen top and bottom using ctrl+a S
+Disconnect from screen with ctrl+a d, and close a window by typing
+'exit' in the bash prompt.
+Change from one side of the screen to the other in split screen using
+ctrl+a [tab], and close split screens using ctrl+a X. Note the use of capitals
+in some of these commands!
+If you ever want to scroll when using multiple windows, you'll have to
+use 'copy mode' by hitting ctrl+a [esc]. Get out of it with [esc].
+
+Good luck and enjoy screen.

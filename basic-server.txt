@@ -1,0 +1,19 @@
+A server takes in requests over some protocol and returns information. For
+example, a database server using SQL returns the information stored in the
+database. This _can_ be on your local computer. A WEB server (as opposed to
+a database server, ssh server, etc) is typically run with:
+ a) Apache HTTP Server
+ b) Nginx, or
+ c) Oracle HTTP Server
+
+These three options make up the majority of web servers. There are a good few
+others out there, including Caddy, thttpd, AOLserver, and Boa. But the main 
+three are up there. Running a _web_ server means that your machine can be
+accessed with the HTTP internet protocol, or others from the TCP/IP suite. 
+
+To run a basic web server, I'm going to use apache. Some things are very
+helpful to know when it comes to servers, so before jumping in let's cover
+our bases.
+
+The key to internet protocols is being able to access computers with their
+own unique address. 

@@ -1,0 +1,202 @@
+To program ARM-based microcontrollers (such as the Atmel SAM A-F or STM32 series microcontrollers) the 
+GCC-ARM software is used. It is command-line based for compiling C specifically with ARM processors
+in mind. The hardware itself can either be downloaded onto a microcontroller (such as with a development
+board like the Discovery boards from STMicro or the Xplained boards from Atmel) or simulated with another
+piece of software, qemu (Quick EMUlator).
+
+Another option for developing with ARM-based processors is to use TrueSTUDIO which is an IDE specifically
+made to be used with ARM architectures. It includes support for many microcontrollers. And of course, 
+each manufacturer will likely have its own IDE that you can use such as STM32CubeMX from STMicro, 
+AtmelSTUDIO from Atmel, and MPLABX from PIC. These come with great support for the microcontrollers 
+in the manufacturer's product line, with varying degrees of premium upgrades and commercial licenses.
+
+Since this text file is written command line, and since these are the least obvious development tools, 
+we'll look at GCC-ARM and qemu. 
+
+QEMU is an emulator for hardware. To use it, you call qemu-* for the appropriate architecture that you're
+working with, along with a bunch of flags/switches that describe necessary details. To run something like
+Linux, you have to have two things. First, the linux image that you want (for example, Raspbian for the
+Raspberry Pi) and second, the kernel for that linux distro that is used with QEMU. This is specific to
+QEMU. Once you have these, and you run the right qemu- command you'll come into the terminal for that 
+device that you're working with. Now you have really fast hardware emulation. 
+
+In Linux, files are stored as one large filesystem called the root directory. That means all files in the
+operating system exist somewhere in the root directory, including devices such as flash drives and CD's. 
+Therefore, when we want to emulate a new device and its filesystem, we have to tell our operating system
+where to look for this new filesystem. This is called mounting the filesystem. 
+
+The operating system image acts as a filesystem as well, in the form of a large file. This is conventient
+because that operating system requires its own root directory and filesystem to operate, so the image file
+provides a good space for it.
+
+There's a lot to cover here with embedded systems and the way that they compile and link their binaries.
+Some of this is covered in the basic-stlink.txt file in this directory, but I'll cover it again for good
+measure. 
+
+Embedded systems run software on microcontrollers and microprocessors and require that the software is
+compiled specifically with the architecture of the microcontroller in mind. There is a huge difference
+even in between manufacturers - MCUs using ARM Cortex M-3 cores for example - in the way data is managed and 
+stored. So you have to be careful and methodical when it comes to writing embedded software. You should
+have a specific system in mind, and then you'll have to make sure that the system you want to design
+with is supported by the tools you want to use. 
+
+You can also either run a single program, or use an operating system to multi-task with your microcontroller. 
+The operating system will take care of shared resources between programs, among many other things. For 
+smaller microcontrollers you would use something like FreeRTOS, which is a C program itself that is compiled
+with your software but has a task manager built in. For more advanced MCUs you would use Linux, in the form 
+of any number of distributions appropriate for your task. Running a single program on your microcontroller
+is called running "bare-metal", a term which is used quite often. 
+
+=================================================================
+The Tools
+=================================================================
+You need development tools to write software for a microcontroller. Everything from where you write the code
+to what you use to download the binaries. Let's take a look. 
+	- IDE
+	- Toolchain
+		* C library
+		* Compiler
+		* Linker
+		* Linker scripts
+		* Debugger
+	- FLASH downloader
+Many times, the tool chain contains the IDE and FLASH downloader as well. Get used to hearing the word "toolchain"
+because all development happens inside the toolchain. 
+
+When we develop for another microcontroller, we're cross compiling. This is why the system tends to be tricky to
+get right. To get a toolchain, there are three options. First, try and build one yourself. This is quite difficult
+due to compatability issues and configuration possibilities. But it is possible. The second option is to us a
+script to find the correct software for your toolchain. This can then be used to download compatible software.
+The best option is to use a prebuilt toolchain, such as those from the now-commercial Code Sourcery. Code
+Sourcery was the best place to go for open source toolchains, but they were bought by Mentor Graphics, who made
+the ARM toolchain commercial only and the other toolchains were relegated to a "lite" edition of their commercial
+software. 
+
+Now we have Linaro for ARM toolchains, which doesa good job and uses developers from CodeSourcery.  Other
+toolchain options include:
+	- DENX Embedded Linux Development Kit (ELDK) - ARM, MIPS, and PowerPC systems
+	- Scratchbox : ARM and x86 primarily, PowerPC, MIPS, CRIS in experimental stages)
+	- Fedora ARM : Tries to port Fedora to ARM
+	- Debian cross-tools : From Debian experimental
+	- Free Pascal : Used for compiling Pascal
+These come from elinux.org/Toolchains. You can see that page for more information. The toolchain is actually made
+up of the following:
+	- GNU Binutils 	: Many tools for making and working with executables, notably the linker, ld, and the
+			assembler, as
+	- GCC		: The C/C++/Java/Ada/Fortran/Obj-C compiler, possibly the only realistic option
+	- glibc		: The C library standard from GNU. It's widely used. Other options are embedded glibc
+			(eglibc, discontinued), uClibc, and musl. The important thing here is that the C library
+			_must_ be built with the entire toolchain, because once the toolchain is built you can't
+			switch to a different library. This is a common reason you have to clean uninstall toolchains
+	- gdb		: The GNU debugger, used as a cross debugger to look into your target device. Another option
+			is OpenOCD (Open On-Chip Debugger)
+
+Toolchains can often be specific to the device they're designed for. Many toolchains exist, though, which cover
+a large number of devices. For ARM technologies, we have:
+	- Ac6 System Workbench (STM32)
+	- Atmel Studio
+	- Code Composer Studio (TI)
+	- CoIDE
+	- CrossWorks for ARM
+	- Dave (Infineon XMC processors)
+	- DRT
+	- Eclipse with GNU ARM plugins
+	- Em::Blocks (STlink)
+	- emIDE
+	- GNU ARM Eclipse (Eclipse CDT extensions)
+	- ARM GCC (Aka GNU Tools, bare metal)
+	- IAR Embedded Workbench
+	- ICC
+	- Keil MDK-ARM
+	- LPCXpresso (NXP)
+	- MikroC
+	- MicroEJ
+	- Ride and RKit
+	- SEGGER Embedded Studio
+	- SEGGER Ozone
+	- Sourcery CodeBench (from Mentor Graphics)
+	- TASKING VX-Toolset
+	- TrueSTUDIO
+	- Visual Studio with GNU Tools/ARMGCC
+	- VXM Design's Buildroot (Cortex)
+	- winIDEA
+	- YAGARTO (no longer supported)
+This comes from Wikipedia. 
+Then you have the debugging hardware, which physically connects from your machine to the board you're working on i.e.
+the target device. These are JTAG and/or SWD (single-wire debug) devices, though you can get "universal programmers"
+as well. 
+	- CMSIS-DAP
+	- CoLinkEX
+	- Crossconnect
+	- iTAG
+	- I-jet
+	- J-Link
+	- J-Trace
+	- JTAGjet
+	- LPC-LINK (NXP LPCXpresso) and LPC-LINK 2
+	- Multilink Universal
+	- OpenOCD (GDB server, supports different devices)
+	- RLink
+	- ST-LINK
+	- TRACE32
+	- ULINK
+And then, for those times when you need to multitask instead of running bare metal, you use Real-time operating
+systems (RTOS's). RTOS's are operating systems where the maximum time from input stimulus to output response
+is definitely determined [Wikipedia]. There are "soft" and "hard" RTOSs depending on how precise the time from
+accepting a "task" to completing it. The variability is called jitter. 
+The most popular of these is probably FreeRTOS, but here's a list:
+	- BeRTOS			: ARM, PowerPC, x86, x86-64
+	- ChibiOS/RT			: x86, ARM, PowerPC, STM32, AVR, MSP430, ColdFire, H8S
+	- CoOS				: STM32, NXP LPC1000, TI LM3S8962, Nuvoton NU1, Holtek HT32
+	- distortos			: ARM, STM32Fx
+	- eCos				: ARM-XScale-Cortex-M, CalmRISC, 680x0-ColdFire, FR30, FR-V, H8, IA-32, MIPS,
+					MN10300, OpenRISC, PowerPC, SPARC, SuperH, V8xx
+	- embKernel			: ARM Cortex M
+	- embOS				: ARM, AVR, ColdFire, H8, HCS12, M16C, M32C, MSP430, NIOS2, PIC, R32C, R8C,
+					RL78, RH850, RX100-700, RZ, SH2A, STM8, ST7, V850, 78K0, 8051
+	- ERIKAEnterprise		: ARM, Hitachi, Altera Nios2, dsPIC, PIC32, ST10, C167, Tricore, PPC, AVR,
+					Lattic Mico32, MSP430, Renesas RX200
+	- FreeRTOS			: ARM, AVR, AVR32, ColdFire, HCS12, IA-32, Cortex-<. MicroBlaze, MSP430, PIC,
+					H8/S, RX100-700, 8052, STM32, EFM32
+	- BRTOS				: Mostly Freescale and TI
+	- FunkOS			: AVR, MSP430, Cortex-M3
+	- Milos				: Cortex-M3
+	- mbed				: Cortex-M, Cortex-R
+	- MQX RTOS			: Freescale products, ColdFire, Kinetis Cortex ARM
+	- nOS				: ACR, MSP430, Cortex-M, M16C, RX600, PIC24, Win32, POSIX, STM8
+	- Nucleus			: ARM, PowerPC, MIPS32-16e, microMIPS, ColdFire, SupeH
+	- NuttX				: ARM, Zilog, 8052, Lattice, RISC-V, MIPS, PIC32
+	- OSE				: Proprietary. ARNm PowerPC, MIPS, IXP2400, TI OMAP
+	- RL-RTX			: 
+	- RTLinux			: Same as Linux kernel
+	- RT-Thread			: ARM, IA-32, AVR32, Blackfin, nios, PPC, M16C, MIPS, MicroBlaze, V850
+	- RTEMS				: ARM, Blackfin, ColdFire, TI C3/C4, H8/300, x86, 68k, MilkymistSoc, MIPS,
+					Nios II, PowerPC, SuperH, SPARC, ERC32, LEON, Mongoose-V
+	- SCIOPTA			: ARM, RX100-700, PoewrPC, ColdFire, HCS12, M16C, Windows simulation
+	- ScmRTOS			: ARM, Blackfin, MSP430, AVR, STM8
+	- SDPOS				: ARM, Blackfin, PIC18/24, i386
+	- ThreadX			: ARC, ARM, AVR, BlackFin, PIC, many more
+	- TNKernel			: ARM, PIC24/32, HCS08, STM32
+	- TNeo				: Cortex-M, PIC24-32
+	- uC/OS-II and uC/OS-III	: 
+	- uKOS				: Cortex-M, 6833, PIC, STM32, CSEM icyflex-1
+	- Unison			: PIC32, ARM, STM32, LPC1x00
+	- uT-kernel			: 
+	- Zephyr			: x86, ARM, ARC, NIOS2
+You can find a comparison chart on Wikipedia as well. A lot of this is coming straight from the old 'Pedia.
+
+Finally, there are the C/C++ libraries, which consist of:
+	- Cortex Microcontroller SOftware Interface Standard (CMSIS)
+	- libopencm3 : ARM
+	- libmaple : STM32F1
+	- LPCOpen : LPC chips
+	- Bionic libc
+	- dietlibc
+	- Newlib
+	- uClibc
+	- EGLIBC
+	- glibc
+	- EFSL : FAT file system
+	- libfixmath : Fixed-point math libraries
+	- wolfSSL : Encryption library
+Among many others. 

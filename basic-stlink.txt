@@ -1,0 +1,42 @@
+The STLink programmer is a piece of hardware and corresponding software used to program STM8 and STM32
+microcontrollers. Unfortunately, there is no simple Linux driver for STLink, so you have to use a
+github repository called "stlink" from user texane. 
+
+This repository will allow you to download the source, make, and install stlink for your computer. From
+there you can use the command:
+	$ st-flash
+With associated switches to program your ST microcontrollers. You can see the switches by typing
+	$ st-flash
+with nothing else. An example for downloading flash is:
+	$ st-flash write myflash.bin 0x8000000
+Which will write "myflash.bin" to memory location 0x8000000 - the FLASH memory (see datasheet p.50). 
+
+When you build a new binary, it will be in ".elf" format. This won't work for st-flash, which expects
+a ".bin" file format. Luckily, ARM-GCC has a built in tool for making the conversion. To do it, simply
+use the command:
+	$ arm-none-eabi-objcopy -O binary myfile.elf myfile.bin
+To confirm that everything worked, you can use another command from the "arm-none-eabi-" family to 
+disassemble the code. This is useful for debugging and checking the final code.
+	$ arm-none-eabi-objdump -D myfile.bin > myfile.asm
+This will print out the disassembled version of the binary i.e. the assembly language version of your
+code, and pipes it to a new file called myfile.asm. Then you can just open the .asm file and verify
+that everything looks hunky dory. 
+
+What's the difference, then, between .elf and .bin? The .elf ending stands for Executable Linkable
+Format, which has symbol lookup so that it can be loaded from anywhere in memory by the kernel and
+use the same symbols it defined by offsetting the addresses to wherever the file was loaded from. 
+
+The binary file, .bin, has no memory fix-ups or relocations, and it will load instructions at specific
+addresses in memory. 
+Source: t0mm13b on Stack Overflow. 
+
+Microcontrollers often have .hex files loaded onto them instead. These are just the ASCII version of
+the binary file, more specifically using the Intel Hex format. Hex files are more similar to .elf files
+in that they have information about where to load the program data. The reason we needed to specify the
+location to load the binary into (0x8000000) is because binary files have no information about where
+they should be loaded in. 
+
+To see any of these executable files in their most pure memory state, you can use a hex editor. This 
+at least is the easiest option. You could also write a C program to run and read individual data bytes
+one at a time if you wanted more control over the format. Hex editors are all over the place, and you
+can even get hex editor plugins for many text editors like Notepad++ (Notepadqq for Linux). 

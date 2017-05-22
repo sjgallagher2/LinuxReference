@@ -1,0 +1,49 @@
+This document is going to explain how to understand the source code of nupic.core, going off of basic c++ development knowledge. To get started,
+we have these folders in the src directory:
+
+-- algorithms		
+-- bindings		
+-- encoders		
+-- engine		
+-- experimental		
+-- math			
+-- ntypes		
+-- os			
+-- proto		
+-- py_support		
+-- regions		
+-- types		
+-- utils		
+
+The types folder contains Types.h and Types.hpp, which is a good place to start working. You can review
+the types defined here to aid in understanding some less-obvious things around NUPIC. Types.h is the 
+basic C definitions file, and Types.hpp (which includes Types.h) is the C++ type definitions.
+
+Acronyms you'll see all over the place:
+-- NTA		Numenta
+-- OPF		Online Prediction Framework
+-- NUPIC	Numenta Platform for Intelligent Computing
+-- CAPNP	Cap'n Proto, used for serialization (turning data types like arrays into files for saving)
+
+In the types files, the difficulty of working on several possible computer systems comes to play. Most of
+this stuff is taking the system's built in types like unsigned int, and defining them more specifically.
+The types in Types.h (C version) are defined first in NTA_BasicType, an enum (typedef'd) that contains:
+	NTA_BasicType_Byte
+	... Int16
+	UInt16
+	Int32
+	UInt32
+	Int64
+	UInt64
+	Real32
+	Real64
+	Handle		An empty handle, the void * operator in C
+	Bool
+	Last		_not_ an actual definition, just used for validation
+	Real
+
+This all covers our bases on types pretty well. NOTE: The types are actually prefaced with "NTA_BasicType_", I
+just didn't feel like writing that out. All these types are then typedef'd without the BasicType part, outisde
+of the enum. A similar thing happens in Types.hpp, adopting these types to C++. 
+
+

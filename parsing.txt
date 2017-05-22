@@ -1,0 +1,9 @@
+In order to parse the calculator's input, a simple scheme using the GNU
+tools Bison and Flex is used. Flex is used for 'tokenizing' the input,
+if you will. It is a lexical program that breaks the input up into
+smaller pieces that can be used by the parser as tokens. 
+
+The parser is Bison, which works with Flex in order to interpret the
+tokenized input. 
+
+

@@ -1,0 +1,73 @@
+Make files are practically essential to programming with a linux 
+environment. Instead of manually compiling, you enter a series of commands
+into the make file. That way, you can run all the commands with a single
+"make". 
+
+Some things to consider about compiling software:
+-- Compiling a single file is done easily with:
+	gcc -o helloworld.exe helloworld.c
+-- Compiling several files with gcc can be annoying:
+	 gcc -o helloworld helloworld.c hellomore.c morefun.c -I
+       The "-I" tells gcc to look in the current directory
+-- What if we have files in several folders up and down
+-- What if we want to specify which version of C, or other flags
+-- Can we optimize so that only files that have changed will be recompiled
+-- If the .h file changes, can we
+   be sure that the .c will recompile
+
+These are the problems that make solves. A make file can look like this:
+
+"Makefile"
+
+IDIR =../include
+CC=gcc
+CFLAGS=-I$(IDIR)
+
+ODIR=obj
+LDIR =../lib
+
+LIBS=-lm
+
+_DEPS = helloworld.h
+DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS)
+
+_OBJ = hellworld.o hellofun.o
+OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+
+$(ODIR)/%.o: %.c $(DEPS)
+	$(CC) -c -o $@ $< $(CFLAGS)
+
+helloworld: $(OBJ)
+	gcc -o $@ $^ $(CFLAGS) $(LIBS)
+
+.PHONY: clean
+
+clean:
+	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~
+
+
+While this looks very ugly, and while there is an inordinate number of
+dollar, percent, and at symbols, this is actually a very fine template
+of a makefile.
+
+To start decoding, it is essential to understand the use of these symbols
+in the file. The $ is used for constants, such as CC. You say $(MYCONSTANT)
+to access the variable. "Rules" are the primary components of the makefile,
+and are named, and then followed with a :. As in, myrule: yadda.c yadda.c...
+In that case, changes to yadda.c files will cause the thing to recompile.
+
+It's important to understand the idea of 'rules' and the : because these
+next symbols refer to a) the stuff to the left of the : and b) the stuff to
+the right.
+
+The stuff to the left of the : is accessed by $@, while the stuff to the
+right of the : is accessed by $^. The $< symbol will access only the first
+item on the right side of the :. Finally, the % symbol is a wildcard, used
+for example as a way to access any file in the directory with a .c extension.
+
+See the file Makefile for a full explanation of how to use Make.
+
+
+
+
+

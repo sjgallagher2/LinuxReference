@@ -1,0 +1,16 @@
+If you're using the command line GNUCAP, then you'll need some know-how:
+Create net lists first using BUILD. Press enter when you're done. 
+Type things in with SPICE syntax.
+To display the output, first enable printing with:
+print op stuffstuff
+where 'stuffstuff' could be v(1) for the voltage at the first node, 
+v(nodes) for all node voltages, v(*) for voltages at components and 
+nodes both (doesn't really make sense for components), i(R1) for
+the current through a component (R1 here), and i(*) for all currents. 
+
+For example: print op v(nodes) i(*)
+That'll give you good information. Then type 'op' to run the simulation.
+
+Same thing goes for other types of analysis. You can see a reference 
+manual online, or the man page from the CLI. 
+Good luck.

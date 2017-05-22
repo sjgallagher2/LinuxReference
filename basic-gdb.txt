@@ -1,0 +1,123 @@
+GNU Debugger, also known as gdb, is used for general debugging of devices and software, such as C and C++ programs. 
+It just might be the most important piece of software you can use for software development, especially in 
+embedded systems. 
+
+In general, gdb works on executables. But not just _any_ executable - gdb only supports C/C++, and partially supports 
+D, Modula-2, OpenCL C, and Pascal programs. But there are enough tools in gdb to consider it worth your time. Really,
+you can debug any executable, but the information will be difficult to interpret so you have to go slow. When you
+compile a C program using gcc, you can use the "-g" flag and that will request that the compiler and linker keep
+the variable names, line numbers, and similar "symbol information" that you would expect. This way, you can really
+see what's going on in a program that you wrote which may be segmentation faulting or something.
+
+gdb works like this:
+	$ gdb
+	(gdb) file myFile.o
+	(gdb) run
+	Program received signal SIGSEGV, Segmentation fault.
+	0x0000000000400524 in sum_array_region (arr=0x7fffc902a270, r1=2, c1=5,
+	r2=4, c2=6) at sum-array-region2.c:12
+	(gdb) break myFile.c:6
+	(gdb) run
+
+Other commands you'll really need are:
+	(gdb) start
+	(gdb) continue
+	(gdb) step
+	(gdb) next
+	(gdb) watch myVar
+	(gdb) print myVar
+
+Let's talk about these. gdb works in its own command line of sorts. You can either type "gdb" and load a file using
+the "file" command, or you can use
+	$ gdb myFile.o
+To automatically load a file in. When you're in, you can execute gdb commands. Two important commands are "run" and
+"start". The run command simply runs the executable. If there are any breakpoints and certain lines or certain functions,
+the program will break. Otherwise, it'll just run through. The start command, on the other hand, adds a breakpoint 
+to main() so that you can step through the program starting at main(). 
+
+Adding breakpoints to C/C++ code that has been compiled with -g is done with the "break" command. Everytime the program
+breaks, you can use "continue", "step", or "next" to proceed. The continue command simply continues execution of the
+program. But the step and next commands are used when you want to work through the program line-by-line. The step
+command is really the "step into" that you might be familiar with - if there is a function call, it will go into the
+function call. The next command is more like "step over" in that all function calls are treated as a single line. 
+To make it easier to step through a lot, pressing Enter at the (gdb) command line will repeat the previous command. 
+
+You can use the commands "clear", "delete", "disable", "enable", "info breakpoints", and "set multiple-symbols" to
+work with breakpoints after they're created. The clear command will delete a given breakpoint _at a line_ in the
+code, while the delete command will delete the breakpoint from the _breakpoint number_ that you give it (e.g. 
+breakpoint 1, breakpoint 2, would be 1 and 2). If you use clear without a line number, gdb will try to delete the
+breakpoint at the current location, if that makes sense. The delete command will remove all breakpoints if no
+breakpoint is specified. The disable and enable commands turn off or on "breaking" for breakpoints. Info will
+give you information. Set multiple-symbols determines how gdb handles multiple breakpoints. Look it up for more. 
+
+As well as breakpoints, there are _checkpoints_ which are "snapshots" of the program state that can be referred
+to again later. These can be very helpful. 
+
+Disassembly can be done with gdb by using the "disassemble" command. Since the default style is AT&T style, you
+can change to Intel style with the "set disassembly-flavor intel" command. There are a good few options for
+disassembly with gdb, so pulling up a reference is a good idea. 
+
+You can attach a gdb session to an already-running process/program by specifying that program's PID using the
+"attach" command. You can see the list of processes currently running using:
+	$ ps		Information on the processing ("process status")
+	$ jobs		A list of processes currently running
+(Note: That's in the terminal, not gdb)
+
+With the PID in hand, you can use:
+	(gdb) attach 1003		1003 is the example PID
+Which will prompt you to restart the process to debug it.
+
+There are many more commands to use in gdb. They are:
+	delete checkpoint		|Checkpoints
+	info checkpoints
+	restart
+	set args			|Debugged program settings
+	set detach-on-fork
+	set disable-randomization
+	set follow-fork-mode
+	set new-console
+	tty
+	set disassembly-next-line
+	detach				|Execution control
+	kill
+	display				|Expression evaluating
+	print
+	set print address
+	set print array-indexes
+	set print array
+	set print elements
+	set print frame-arguments
+	undisplay
+	x
+	info address			|Information
+	info registers
+	info files
+	info functions
+	info line
+	info registers
+	info source
+	info sources
+	info symbol
+	info types
+	info variables
+	info vector
+	info vtbl
+	info sharedlibrary		|Shared library
+	set auto-solib-add
+	set solib-search-path
+	set stop-on-solib-events
+	set sysroot
+	sharedlibrary
+	backtrace (also known as bt)	|Call stack related
+	down
+	frame
+	info args
+	info frame
+	info locals
+	select-frame
+	set backtrace limit
+	set backtrace past-entry
+	set backtrace past-main
+	set filename-display
+	up
+

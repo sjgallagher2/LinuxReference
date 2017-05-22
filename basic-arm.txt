@@ -1,0 +1,152 @@
+To program with ARM-based microcontrollers (RISC architecture, as opposed to x86 processors with CISC architecture)
+you need a good ARM toolchain that supports the device that you're working with, maybe some debugging hardware,
+and either bare metal or operating system-based software to load into your device's flash memory. You should have
+the datasheet and everything on-hand, because there's no way to know the memory addresses and such otherwise. 
+
+There's a lot of development tools available. A toolchain is the most important, and the word is used very often. 
+The toolchain is simply the collection of C library, compiler, debugger, flash downloader, and sometimes the IDE,
+for a given piece of hardware. The compiler also contains a linker and an assembler, and many other tools that
+you'll need during development. 
+
+There are many toolchains available. You can make one yourself by simply downloading the components you need,
+but this can be a real pain due to compatibility of software versions and patches and such. It's better to 
+use a ready-to-go toolchain such as TrueSTUDIO by Atollic, IAR Embedded Workbench by IAR, or GNU Tools (ARM-
+GCC, supports bare-metal programming only). Note that the term "bare metal" means your not using an OS. You can
+see the "basic-embedded.txt" file for a complete list of ARM development tools, real time operating systems,
+etc, as well as a deeper explanation of the toolchain. 
+
+Some devices can be emulated with QEMU, the Quick EMUlator. This is usually done for more advanced microcontrollers
+running operating systems but there's not really any hard rule about that. You can check QEMU to see if your 
+device is supported or not. 
+
+Debugging can be done with your toolkit, but you'll probably need some other stuff as well. Get familiar with
+gdb, as that will help. Hardware tools are device-specific typically, though universal programmers exist. 
+If your toolchain doesn't support debugging for your device yet, such as TrueSTUDIO on Linux not supporting ST-LINK,
+I recommend OpenOCD, which acts as a gdb server for ARM and MIPS microcontrollers and microprocessors. 
+
+====================================================================
+Using TrueSTUDIO, ST-FLASH, and OpenOCD
+====================================================================
+TrueSTUDIO for Linux doesn't support ST-LINK. This means that when programming for STM32 microcontrollers, you
+have to use other tools to (a) download FLASH and (b) debug. TrueSTUDIO does support a wide number of STM devices,
+so that's a bonus, and they have a good amount of example projects. Compiling and everything works well, it's just
+the downloading and debugging that we'll have to do ourselves. 
+
+Unfortunately, we can't just take what TrueSTUDIO gives us, and load it into flash, because the software is compiled
+into a .elf file, and the open source ST-FLASH software only let's us load .bin (binary) files. This means we'll
+also need some binary tools (binutils) for ARM cross platform development (cross platform because we're compiling
+for ARM microcontrollers with an x86 machine in all likelihood). So we'll need to use some gcc or arm-gcc to make
+a binary file from the .elf file. 
+
+Another thing that can be tricky to get a hold of is the linker script for compiling. There are times when you
+can find a linker script that will work for your device online or paired with your toolchain, and times when you'll
+need to write your own. They can be a pain to write as well. But this goes for any toolchain, not just TrueSTUDIO. 
+
+Microcontroller products come in a variety of shapes and manufacturers. Luckily, manufacturers tend to standardize
+the way their microcontrollers are programmed by providing an API. For Atmel ARM-based microcontrollers, this is
+the ASF (Atmel Software Framework) API which is found e.g. with the Atmel Studio toolchain. For STM32 devices, 
+this isthe HAL (Hardware Access Layer) and LL (Low Layer) APIs, found with various STM32-supporting toolchains. 
+To program a microcontroller, then, you don't need the ARM instruction set too often. Most of the time, getting
+a good handle on the API is the important part. You should have the ARM instruction set reference (there are a few
+instruction sets, namely ARM, Thumb, and Thumb-2) handy, but also have the datasheet for your microcontroller, and
+the API reference. If you want a microcontroller-specific reference for low level/assembly programming, look into
+the programming guide for your microcontroller. 
+
+The first part of familiarizing yourself with an API is to get the filename conventions down, and figure out any
+acronyms that are used often. Find where the library files are stored, which files include what, and what you
+need to include in your projects. Then consider how to configure the device your working with using the API, for
+example GPIO settings, and clock paths. Most of the time, the microcontroller will use several clocks including
+a system clock, peripheral clocks, and GPIO clocks. It can get a bit confusing at first so really spend some time
+getting familiar with your MCU's clocking system. 
+
+When you're working on a project in an eclipse-like environment such as TrueSTUDIO, you have to make sure the
+toolchain (typically called arm-truestudio-eabi-gcc, where truestudio is the toolchain) knows how to compile
+everything. If the project was opened as an eclipse project and not a C/C++ (CDT) project, you'll have to convert
+it by right clicking on the project, going to New > Convert to C/C++ Project. Not the most intuitive UI but
+that's how to do it. Then you'll need to configure the project for your specific MCU somewhere in the project
+settings menu, and also add a few preprocessor symbols like your board name etc. You can see examples of these
+in TrueStudio's example projects. 
+
+If compiling works, your ready to download the program onto the chip's flash. This is done with ST-FLASH for
+STM32 microcontrollers; see the file "basic-stlink.txt". You only have to do this because, again, TrueSTUDIO
+doesn't support ST-Link with Linux yet. Another option is to flash the chip through OpenOCD. Speaking of OpenOCD..
+
+To run OpenOCD, you need to understand briefly how it works. It uses an open telnet connection to run a gdb server
+which you can connect to. It uses configuration files (.cfg) to run, and most of these can be found in:
+	/usr/local/share/openocd/scripts/interface
+and
+	/usr/local/share/openocd/scripts/target
+You'll probably use two configuration scripts. The first one for the st-link (stlink-v2.cfg) and the second for
+your target device (stm32f4x.cfg for example). You can either use these with the full location or copy them into
+your project directory. Then you can run the command "openocd" with the "-f" flag for both configuration files. 
+The -f flag loads in configuration files. 
+	$ openocd -f stlink-v2.cfg -f stm32f4x.cfg	This only works if you copied the config files in
+Now you should have a server running for openocd. Next we'll open a new terminal to connect to that server through
+telnet. We can use the 4444 port number on localhost to connect to with telnet. 
+	$ telnet localhost 4444
+This number, I assume, was chosen at random by OpenOCD and it has stuck. If you were to run your own file you could
+use 1234 or something, but for now use what OpenOCD gives you: 4444.
+
+Once you telnet in, you should see "Open On-Chip Debugger" printed with a command line. To test things out, try
+running:
+	> reset init
+	> reset run
+The first command will stop any program from running after resetting the microcontroller, and the second will 
+reset the microcontroller and run the firmware that's been loaded into flash. 
+
+The "reset init|run|halt" command is used to reset the device into a specified mode of operation. The three modes
+are init, run, and halt. Halt will stop any execution and the MCU will simply... halt. The run mode will, of course,
+run the firmware that's been loaded into flash. The init mode will reset the device and run the "reset-init" script,
+which is described in the .cfg file for your target device. More on that later?
+
+To get an idea of what commands you can run with OpenOCD, you can type "help" which will give a list of commands
+you can run. For more information, you can look into the OpenOCD user manual and other documentation and tutorials.
+
+Some terms to get familiar with:
+	- TAP : Test Access Ports, the primary part of JTAG used for debugging, programming, boundary scan.
+	- TRST and SRST : JTAG pins, for Test Reset and System Reset, resp.
+
+Now, if you don't feel like opening a new terminal window and you don't care much for the output from the other
+side of the OpenOCD server, you can run open ocd as a daemon/background process. 
+	$ openocd -f stlink-v2.cfg -f stm32f4x.cfg &
+
+This is really important for this next part, where we use OpenOCD as it was meant to be used: in conjunction with
+gdb. This gives a more familiar interface for those used to gdb, which is well worth knowing for anyone anyway. 
+To do this, we start openocd, telnet in and halt, then get out of the telnet session and use arm-none-eabi-gdb
+to telnet in from gdb. 
+	$ openocd -f stlink-v2.cfg -f stm32f4x.cfg &
+	$ telnet localhost 4444
+	> reset halt
+	> exit
+	$ arm-none-eabi-gdb
+	(gdb) target remote localhost:3333
+	(gdb) file mybinary.elf
+	(gdb) stepi
+	(gdb) continue
+	Continuing...
+	^C						(interrupt operation with ctrl+c)
+	(gdb) info stack		(could simply type 'where' instead)
+	(gdb) list
+	(gdb) step
+	(gdb) info registers		(gives information on the registers _in the stack frame_)
+	(gdb) etc...
+Here, we assume that the file loaded into flash was called "mybinary.elf", then we use the stepi command to get
+into the next machine instruction (as opposed to step which steps through source code lines). Note that this
+happens in the directory where mybinary.elf is located, even if you actually loaded mybinary.bin into the flash.
+You'll be able to see that main.c is running even still, as long as you allowed for debugging during compilation
+(toolchains with IDEs tend to do this anyway). Now you're in like flynn, go crazy. 
+
+By the way, you see processes running in the background like openocd with "jobs" and you stop them with "kill %2"
+or whatever number process the desired application is. Just in case you forgot. 
+
+But what if you want to send commands to OpenOCD from gdb? For example, you can investigate the current stack
+frame with gdb but you can't use JTAG and other oh-so-important tools. Luckily, you use the command 'monitor'
+to send commands to OCD. 
+	(gdb) monitor reset run
+Is the same as:
+	> reset run
+In the telnet session. Now you you can use 
+	(gdb) monitor help
+To get the full list of commands available. See documentation of OpenOCD for more. Some helpful commands are:
+	(gdb) monitor reg			Lists the values of all registers. You can also use this command to set regs.
+	

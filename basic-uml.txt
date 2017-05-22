@@ -1,0 +1,25 @@
+A great tool for creating a program structure is UML. ArgoUML is 
+free, and you can run it by cd'ing Devel/UML/argouml-0.34, then
+type java -jar argouml.jar
+Once you're in you can make usecase diagrams, class diagrams,
+or sequence diagrams. These are the most common types. There
+are obviously a shitload of diagram types (like, 11?) with
+conventions so nevermind that.
+
+The structure can seem odd. You have diagrams, which are the
+actual drawings, and then you have models, which I believe
+are collections of diagrams for a specific branch of the 
+development process e.g. roll-out and application. The
+models are all held in a project folder, which encapsulates
+the entire thing. 
+
+PROJECT~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+|----Model 1
+|--------Class diagram
+|--------Use case diagram
+|----Model 2
+|--------Sequence diagram
+|--------State machine diagram
+|----Model 3 
+|--------etc...
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

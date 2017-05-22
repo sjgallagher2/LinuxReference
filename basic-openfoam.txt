@@ -1,0 +1,192 @@
+Starting OpenFOAM, the CFD (computational fluid dynamics) software, is done
+with:
+	openfoam4-linux
+From the OpenFOAM/sam-4.1 directory. This enters into this "virtual drive" 
+through Docker Hub. 
+
+There are folders in this drive that generally start with $, for example
+	$FOAM_RUN	A user created folder for storing stuff		
+	$FOAM_TUTORIALS	A directory of tutorial files for OpenFOAM
+	$FOAM_SOLVERS	Directory of solvers (see below) 
+
+CFD simulations aim to calculate the velocity (x,y,z) and pressure during
+fluid flow. There are also heat flow simulations, and stress simulations,
+that share the similar FEM/FVM (finite-element and finite-volume methods)
+techniques for solving partial differential equations. 
+
+The actual equations being solved for (in fluids) are the Navier-Stokes 
+equations. There are 4 equations, one for each velocity component and one 
+for the pressure. The equations themselves are really not too complicated, 
+mostly it's F=ma as applied to fluids. The fluids are assumed as continuums 
+in steady flow, meaning it's not separated into "particles" but rather 
+is assumed to be continuous. 
+
+To actually simulate fluid flow, you need geometry (boundaries etc), and a 
+source/sink. Then you must choose the type of flow you're investigating. 
+These vary depending on flow type (laminar or turbulent), whether the flow
+is compressible or incompressible, whether the flow is isothermal or not,
+and the characteristics (viscosity, density, Reynold's number) of the fluid
+under consideration. 
+
+OpenFOAM has several solvers for different types of flow. Different
+flows require different methods to solve, hence the need for many, many types
+of solvers. They are:
+
+Basic CFD
+	laplacianFoam
+	potentialFoam
+	scalarTransportFoam
+
+Incompressible Flow
+	adjointShapeOptimizationFoam
+	boundaryFoam
+	icoFoam
+	nonNewtonianIcoFoam
+	pimpleFoam
+	pimpleDyMFoam
+	SRFPimpleFoam
+	pisoFoam
+	shallowWaterFoam
+	simpleFoam
+	porousSimpleFoam
+	SRFSimpleFoam
+
+Compressible Flow
+	rhoCentralFoam
+	rhoCentralDyMFoam
+	rhoPimpleFoam
+	rhoPimpleDyMFoam
+	rhoSimpleFoam
+	rhoPorousSimpleFoam
+	sonicFoam
+	sonicDyMFoam
+	sonicLiquidFoam
+
+Multiphase Flow
+	cavitatingFoam
+	cavitatingDyMFoam
+	compressibleInterFoam
+	compressibleInterDyMFoam
+	compressibleMultiphaseInterFoam
+	driftFluxFoam
+	interDyMFoam
+	interMixingFoam
+	interPhaseChangeFoam
+	interPhaseChangeDyMFoam
+	multiphaseEulerFoam
+	multiphaseInterFoam
+	multiphaseInterDyMFoam
+	potentialFreeSurfaceFoam
+	potentialFreeSurfaceDyMFoam
+	reactingMultiphaseEulerFoam
+	reactingTwoPhaseEulerFoam
+	twoLiquidMixingFoam
+	twoPhaseEulerFoam
+
+Direct Numberical Simulation (DNS) - Very intensive, used sometimes for research
+	dnsFoam
+
+Combustion
+	chemFoam
+	coldEngineFoam
+	engineFoam
+	fireFoam
+	PDRFoam
+	reactingFoam
+	rhoReactingBuoyantFoam
+	rhoReactingFoam
+	XiFoam
+
+Heat Transfer and Buoyancy-driven Flow
+	buoyantBoussinesqPimpleFoam
+	buoyantBoussinesqSimpleFoam
+	buoyantPimpleFoam
+	buoyantSimpleFoam
+	chtMultiRegionFoam
+	chtMultiRegionSimpleFoam
+	thermoFoam
+
+Particle-tracking Flow
+	coalChemistryFoam
+	DPMFoam
+	MPICFoam
+	icoUncoupledKinematicParcelFoam
+	icoUncoupledKinematicParcelDyMFoam
+	reactingParcelFilmFoam
+	simpleReactingParcelFoam
+	sprayFoam
+	sprayDyMFoam
+	sprayEngineFoam
+	uncoupledKinematicParcelFoam
+
+Discrete Methods
+	dsmcFoam
+	mdEquilibrationFoam
+	mdFoam
+
+Electromagnetics
+	electrostaticFoam
+	magneticFoam
+	mhdFoam
+
+Stress Analysis of Solids
+	solidDisplacementFoam
+	solidEquilibriumDisplacementFoam
+
+Finance
+	financialFoam
+
+Each of these solvers has its place in the CFD world. You can find a description 
+of each of these online at cfd.direct/openfoam/user-guide/standard-solvers/
+
+There are three stages of a CFD simulation:
+	1. Preprocessing
+	2. Running
+	3. Postprocessing
+Each simulation is a "case" (also referred to as a "problem" in some FEM software)
+where each case has data for the mesh, fields, properties, control parameters, and 
+other information relevant to the simulation. This is set up in the preprocessing
+stage. 
+
+The "Run" stage is rather obvious - the solver of choice is called to run either
+in the foreground or the background, such as:
+	icoFoam -case $FOAM_RUN/cavity/
+or (from within the case directory)
+	icoFoam
+Both work fine. This will run the icoFoam solver in the foreground.
+
+The postprocessing stage involves reading the results, formatting the graphics, 
+and doing whatever analysis on the data is desired. This is where the simulation
+result is interpreted and you see how things progress over time. From within
+a case directory, where the solver has already run, you can simply call
+	paraFoam
+which is the graphics processing program for OpenFOAM. paraFoam can be called
+whenever throughout the simulation, from preprocessing to look at the 
+mesh that has been created (which is done with a cad file), to postprocessing
+to see color graphs and 3D objects from the flow results.
+
+For more information, see the OpenFOAM User Guide, Tutorial Guide, or whatever
+YouTube videos or random articles you want to use to learn. 
+
+To play around with OpenFOAM, which is obviously more interesting than reading
+the documentation, try recursively copying case files from $FOAM_TUTORIALS. These are 
+located like so:
+	$FOAM_TUTORIALS/incompressible/icoFoam/cavity/cavity
+for, in this case, a incompressible flow using the icoFoam solver - the 
+transient solver (that is, solved over time) for incompressible, laminar
+flow of Newtonian fluids, called "cavity".
+
+Remember, to get into the environment to access those files, you simple use
+	openfoam4-linux
+from within a good root directory that ISNT the Home directory (this is forbidden). 
+
+Then you create your 3D mesh that is used for solving, by running 
+	blockMesh
+from inside the case directory. Then take a look by running
+	paraFoam
+And then you can run the solver using
+	icoFoam
+Then finally look at the results by refreshing the directory in paraFoam and messing
+with the side panel things like the coloring and variables viewed. 
+
+Good luck, and enjoy OpenFOAM. -Sam

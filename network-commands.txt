@@ -1,0 +1,21 @@
+Let's say you need some information on your networking whatever. What
+do you do? 
+Hardware information can be found with things like:
+ifconfig	interface configurator, ip, mac address
+iwconfig	wireless network interface configuration
+ethtool		view NIC information
+rfkill list	list ip devices and whether they are available
+
+Software and higher layer information can be found with:
+netstat		connection information, routing table
+netstat -r	routing table, specifically
+ping		test connection between nodes
+traceroute	see the entire path of packets
+route		work with linux routing table
+nslookup 	DNS information of a website
+host		find IP address from website name
+arp		address resolution protocol contents
+arp -e		actually view arp tables
+hostname	identify a network, like your hostname
+tcpdump		packet viewing; powerful tool, deserves its own page
+

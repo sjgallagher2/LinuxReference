@@ -1,0 +1,26 @@
+LISP is not too similar to other languages - not ones that I know in any case. 
+In order to get started programming in LISP, as opposed to just
+scripting away in the terminal, you create a .lisp file with whatever
+commands you want to send, and then you open clisp in another window. 
+Run (load "myfile.lisp") to run every command through the command line. 
+You can then compile and run things e.g. with binary by:
+(compile-file "myfile.lisp")
+which will create a .fas that can be used with LISP. 
+Comments and commands in LISP can be found on the Learn X
+in Y minutes Common Lisp page. 
+
+Note about how lisp works: everything is a 'list', and the first part
+of the list is always checked to be a function. For example,
+(+ 1 2) is a common first expression. The + is the function, and
+it is the first item in the list. Any time you have parens (or almost), you
+need to make sure the first item is a function. 
+
+The exceptions to this are when you have lists done via the '() macro,
+and when you have function parameters defined, like
+(defun hello-world () ...)
+where the () is where any input parameters WOULD go.
+
+Other symbols you see a lot are ' and # and :. They are macro characters,
+denoted "single-quote", "sharpsign" and "colon". 
+
+Good luck.

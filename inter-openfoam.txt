@@ -1,0 +1,134 @@
+OpenFOAM is a pretty complicated software suite. Really, it is an extension of the C programming language,
+with libraries and programs to do a lot of the CFD work. It's natural, then, for someone that is not used
+to working with these types of programs to get confused, or frustrated. 
+
+This is a follow-up to basic-openfoam.txt. Let's talk about how running a simulation in OpenFOAM really
+works. 
+
+The generally accepted way to start a new case in OpenFOAM is to copy a directory of a similar simulation
+directly from the OpenFOAM tutorials located in $FOAM_TUTORIALS. These give a good starting point for 
+whatever you're working on, and there are generally tutorials that will apply to most any simulation. 
+
+Copy the directory into your run/ folder under a new name:
+	cp -r $FOAM_TUTORIALS/category/tut_case/* $FOAM_RUN/new_case
+This copies the contents of the "tut_case" folder into your "new_case" folder. Not exactly groundbreaking
+stuff but just so we're all on the same page. 
+
+Making a mesh involves (a) some outside CAD software or (b) a text file containing the locations of vertices
+and so on. Using other CAD software is almost always preferable. FreeCAD is a good one to use. Once you
+have the 3D file, you can either let OpenFOAM create the FVM mesh (which is actually used in analysis) for
+you by making another text file, or you can use other software. GMSH is a good choice. Those are the only
+two "extras" you really need to run simulations in OpenFOAM with less hassle than learning how to write 
+the text files (called dictionaries). 
+
+You start with a 3D file, export it to .step. You can use other formats, but STEP always works and so I
+always use it. Then you open that STEP file in GMSH. GMSH is used only for making meshes from 3D files,
+and it takes some getting used to. The menu you have shows a bunch of things, and making the mesh really
+is as simple as clicking "Mesh->3D". But don't do that yet.
+
+OpenFOAM doesn't know what face is what, and GMSH can handle that for us but it takes some finesse. GMSH
+is another piece of software that isn't inherently GUI based, the GUI is more of a "helping hand". So 
+we'll have to use a text editor later to change one of the files, called a .geo file. 
+
+First, though, we name (a) the faces and (b) the volume itself. There's usually several faces and only
+one volume. To label them isn't super intuitive at first. Go to Geometry -> Physical groups -> Add
+and you'll see "Point", "Line", "Surface", and "Volume". Use the "surface" one to first click a surface
+and then press 'e' to end your selection. This is your first "patch", like an inlet, or wall. GMSH will
+show you what that face is called, and will call the physical group (the surface) something. Remember
+what it is. 
+
+You can either select individual faces or select several at once as long as they all have the same
+properties. Just repeat the whole "select a face, press 'e'" thing. It seems like nothing is happening
+but don't worry. 
+
+The first face you select, you'll get a popup asking if you want to make a .geo file, and you should
+say yes. 
+
+With all the surface selected, select the volume as another physical group. You might have to turn
+off the surface visibility to see the volume dot in the middle. Double click in the viewer and
+you can get to "geometry settings" or some such to turn off surfaces. 
+
+Now that's all done with, we need to give those faces names, and the volume too. Not mandatory, but
+unless "19" means more to you than "front_inlet", it'll be helpful in OpenFOAM. Unfortunately, 
+GMSH doesn't let you do this from the GUI, so this is when we open up the .geo file in a text editor. 
+You'll see your physical groups listed. Hopefully you remember which ones are which, and you can go 
+ahead and replace them with names instead of numbers. There should only even be one other line, that
+says
+	Merge "file.step";
+Which just says to use the STEP geometry, along with these physical surfaces. The rest looks like this:
+	Physical Surface(12) = {4};
+Where 12 is the physical group name we're going to change, and 4 is the face. If you select several
+faces for a surface, it'll look like
+	Physical Surface(5) = {9, 16, 22};
+It's all the same.
+Change it to something helpful, by putting a string instead of an integer in the Surface() part:
+	Physical Surface("outlet") = {4};
+You can change the Volume as well, to something like "internal".
+
+You save that, exit out, open GMSH back up. We're ready to mesh our geometry. (It's that easy!). 
+This part doesn't take much. Just go to Mesh -> 1D, then 2D, then 3D. I usually do it in order,
+but I'm fairly sure you can just click 3D. Even still. You should see all your mesh stuff appear
+with the geometry. Save it, and we're good to go. 
+
+But what if the mesh doesn't look right? Again, GMSH is a pain to use sometimes, but the things
+that help are double clicking in the viewer (the 3D space) and looking through the menu options
+as well as the top tabs. If you're still not finding what you're looking for, you could be 
+in for another game of close -> change in text editor -> reopen. Hopefully not, though. 
+
+Now you have a mesh, you export the mesh to .msh. Then put it in your case folder, in the heart
+of it all (i.e. not in constant, system, or 0, just in my_case/). Then you can go ahead and
+open OpenFOAM like we do in basic-openfoam.txt. We're almost done. Sort of. 
+
+Really, this stuff up until now has not involved OpenFOAM at all, it's just getting a Mesh
+together with names for its faces. That all takes some practice but it goes quickly once you
+get one or two files under your belt. 
+
+Now we have OpenFOAM open in our command prompt, and we're all ready to go and work with our fresh to
+death mesh. We need to do a minimum of two things. First is use the command
+	gmshToFoam my_mesh.msh
+From the root of the case directory. This will take whatever mesh used to be there are replace it with
+your new stuff. 
+
+The whole "case" directory can take time to get used to. We have:
+	constant/	Geometry, mesh, names of faces and boundaries
+	system/		Dictionaries, finite volume scheme and solution files
+	0/		Time directory, the 0/ folder sets the initial conditions of the simulation
+Note that after we replace the old mesh with the new mesh, we can double check that everything is OK
+by going into constant/polyMesh/boundary and checking that it all lines up. The thing is, we need
+to change this file because it probably says that everything is a type "patch" and physical type "patch",
+but we'd rather it said useful things. For walls, change the type and physicalType to wall, for 
+faces that you don't want to interact with your simulation use empty, and for inlets and outlets, set the
+type to be patch, and the physicalType to be inlet. The type will probably already be patch anyway. 
+
+Then you have the defaultFaces, which depending on your simulation are either empty, or wall. You
+can tell that changing names from numbers to things like "front" will help us here. 
+
+The last essential thing to do is a pain, but it's not too complicated. You're going to change the
+initial conditions to work with the face groups that you've set. For example, setting the initial
+pressure and velocity at the inlet, and setting no-slip conditions for your walls. 
+
+This happens in 0/, like I said above. Go into 0/ and you'll see p (for pressure) and U (for velocity)
+and maybe some others. Go in, and replace whatever group names used to be there with your group
+names that you've created. For example, if the face "front" is an inlet, I set the pressure in p to
+be:
+	front
+	{
+		type	freestreamPressure;
+	}
+The walls are set to type "zeroGradient" and the emptys are set to empty. For velocity in U, you set
+wall types to noSlip, and inlet/outlet types to freestream again. Then you also have to set freestreamValue
+for the freestream, which consists of three numbers in parentheses. This is probably in the file already. 
+In fact, most of these are probably in the files to give you an idea of what it should all look like before
+you replace the old names of boundaries with the you names. 
+
+There's a lot of OpenFOAM stuff that goes on here. There are many solvers, many formatting standards to follow,
+many settings with brackets and numbers that you need to know. The OpenFOAM tutorials are a great place to
+go to get information on all that. 
+
+You can confirm the solver settings and timing in system/controlDict. When you're all set, you can go ahead
+and run
+	simpleFoam
+or
+	icoFoam
+Or whatever your solver of choice is (see basic-openfoam.txt) and then you can view the results in ParaView. 
+

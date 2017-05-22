@@ -1,0 +1,172 @@
+Originally written by Michael Ferrier, in his implementation of the CLA located at MichaelFerrier/HTMCL on
+github. I really liked all the notes he makes on various parameters, and I think that they are valuable.
+
+===========================================================================================
+Notes on Parameters
+===========================================================================================
+
+Through experimentation I discovered a few properties about the different parameters and how 
+they relate to one another:
+
+NewNumberSynapses (aka newSynapsesCOunt in the white paper): This number should always be 
+lower than the number of active cells that a cell usually has in its LocalityRadius (ie., 
+that are available to be incorporated into distal segments). That way a distal segment will 
+be adding synapses to a sample from the local activity, not adding *all* of the local 
+activity. This is how its function is described in the Numenta docs. I found that if 
+newSynapsesCount is greater than the number of active cells in localityRadius, then that 
+leaves blank "slots" to be filled in later with part of a different pattern sharing some of 
+the same columns, which causes lots of problems (as I described under problem #3 in the 
+temporal context forking thread on the OpenHTM forum).
+
+MinSynapsesPerSegmentThreshold (aka minThreshold in the white paper): The lower this number, the 
+more likely that a similar pattern will be added to an existing segment rather than having a 
+new segment created for it. So long as NewNumberSynapses is less than the typical number of 
+locally active cells (as described above), this parameter doesn't need to be very high. 
+MinSynapsesPerSegmentThreshold should always be <= SegmentActivationThreshold (to avoid 
+problems where a cell isn't predicted or activated, but is chosen to be a learning cell). 
+I've been using values between 1 and 5. As described above, I've added an option to provide 
+a range for MinSynapsesPerSegmentThreshold, so that each column has a random value within 
+that range chosen for its own MinSynapsesPerSegmentThreshold. This results in some columns 
+being predisposed to choose the same cell to represent similar contexts, while others are 
+biased to pick a different cell. This way the closer two contexts are to one another, the 
+more cells the representations of those contexts will have in common, which should help with 
+the learning of generalization. Providing a range like that is not necessary to fix the 
+temporal forking problem however; using a higher value such as 5 results (in my tests) in 
+different cells being chosen for diffrent contexts, and all of the temporal forking tests 
+working correctly. Further note: This parameter is very important for the temporal context 
+forking problem. Too low and the same cells will be chosen for a given pattern in different 
+contexts. Too high and different cells will be chosen all the time as new context is 
+learned further and further back, resulting in reuse of some of the same cells as it loops 
+around (a short looping sequence such as ABBCBBA).
+
+SegmentActivationThreshold (aka activationThreshold in the white paper): This number should 
+not be lower than MinSynapsesPerSegmentThreshold, as implied in the white paper description 
+for getBestMatchingSegment(): "The number of active synapses is allowed to be below 
+activationThreshold, but must be above minThreshold." In my tests I have it set to 5.
+
+PermanenceIncrease and PermanenceDecrease: If setting your parameters to allow the same 
+segment to be used sometimes in similar contexts (by using a lower value for 
+MinSynapsesPerSegmentThreshold), then PermanenceInc and PermanenceDec (for distal synapses) 
+must be set so as to allow multiple patterns to be supported by a single segment. The higher 
+the ratio of PermanenceInc/PermanenceDec, the more patterns can be supported in a single 
+segment. I'm using PermanenceInc 0.01 and PermanenceDec 0.005.
+
+===========================================================================================
+Changes from the White Paper and the OpenHTM implementation
+===========================================================================================
+
+This C++ implementation of the CLA sticks pretty close to the Numenta white paper and to the 
+OpenHTM implementation. However there are a few major differences that should be reviewed.
+
+Hierarchy
+=========
+In this implementation, an InputSpace provides input to the network and a Region performs 
+learning. The Region and InputSpace classes both inherit a common interface called DataSpace, 
+which a Region uses to query its inputs. So, a Region may have any number of inputs, each of 
+which can be either an InputSpace or another Region. Regions are processed in the order that 
+they are defined in the network file.
+
+Hypercolumns
+============
+This implementation incorporates the idea of a cortical hypercolumn, which is a group of 
+columns (in the brain, about 100 columns) which all receive input from the same area of their 
+inputs, and which mutually inhibit among themselves. In area V1, one hypercolumn contains 
+columns that represent lines of all different orientations. The columns in a hypercolumn 
+mutually inhibit among themselves, which helps to cause the different columns to specialize 
+in learning to represent different features (mostly lines of different orientations) and 
+which also causes only one column to be active per hypercolumn at a time. There is a 
+diffrerent hypercolumn for each small patch of the visual field.
+
+In this implementation, hypercolumns can be used by setting a region's HypercolumnDiameter. 
+This defaults to 1, in which case the region acts like an OpenHTM region -- each column is 
+its own hypercolumn. InhibitionRadius and PredictionRadius are specified in hypercolumns, so 
+if HypercolumnDiameter is > 1, it will affect how these values are used.
+
+A Region has an <Inhibition> tag, with a "type" attribute. If type is set to "automatic", 
+inhibition will work the way it's described in the white paper and implemented in OpenHTM, 
+where an inhibition radius is determined based on the average receptive field size of 
+columns in the Region. If inhibition type is set to "radius", however, then a radius is 
+specified, which is measured in hypercolumns. If the given radius is 0, then only columns 
+within the same hypercolumn will mutually inhibit, as in V1.
+
+Overlap
+=======
+In the CLA white paper and in the OpenHTM implementation, a column's Overlap value is simply 
+the count of its active, connected proximal synapses, multiplied by the column's Boost value 
+(a number >= 1). This is also the case in my implementation, but an additional factor is 
+multipled in. That factor is the ratio of the number of connected active synapses, over the 
+sum of itself plus the number of strongly connected inactive synapses. A strongly connected 
+synapse is defined as a synapse with permanence > InitialPerm.
+
+The thinking behind this is that a column which exactly represents a particular pattern of 
+active inputs should be a better match for that pattern than another column that represents 
+the same active inputs plus additional active inputs. For example, say a number of inputs 
+are active such that they form the image of a 45 degree line. One column may have only 
+enough connected synapses to exactly represent that pattern, while another column may have 
+all of its synapses connected -- all of the ones that represent that line, plus every other 
+synapse representing every other input. In this case, in without the factor that I brought 
+in, both columns would have the same overlap (given that they have the same boost value). 
+That makes the columns that have most or all of their synapses connected "greedy", in the 
+sense that they can represent many smaller patterns that they don't fit very well. This 
+causes problems when trying to apply CLA to a vision application, and may cause problem in 
+non-visual applications as well. My solution isn't perfect, but to fully address this 
+problem would mean making major changes to how the spatial pooler works.
+
+Boosting
+========
+Boosting is very important for its use in "separating" different patterns so that they share 
+a minimum of active columns. This is necessary in order for the temporal pooler to be able to 
+differentiate between different spatial paterns, and therefore to be able to make clear 
+predictions.
+
+I was unable to get useful results out of the boosting algorithm given in the CLA white paper 
+or in the OpenHTM implementation. Boosting is completely implemented in Column's 
+PerformBoosting() method, so a look at the code and comments in that method will help explain 
+the changes I made. In short:
+
+- If a column's ActiveDutyCycle is less than a small fraction of its MaxDutyCycle (the 
+maximum ActiveDutyCycle of all the columns in its inhibition radius), then a value (the 
+boost rate) is added to the column's Boost value. This is as described in the CLA.
+
+- If a column's Boost rate is increased for the first non-consecutive time (ie. a new period 
+of boosting has begun for it), then each of its connected synapses have their permanence 
+decreased to ConnectedPerm. This makes it easier for the column to come to represent a 
+modified version of the pattern that it currently represents.
+ 
+- A column's boost value is limited to the range from its MinBoost to MaxBoost. MinBoost is 
+a tiny random amount above 1.0, and MaxBoost is a tiny random amount below the Region's 
+given MaxBoost parameter value. The reason for each column having slightly different 
+MinBoost and MaxBoost values is so that multiple columns that have the same overlap and 
+have reached either MinBoost or MaxBoost, will end up having slightly different 
+(post-boosted) overlap values. This is to avoid ties between many columns that have the 
+same overlap value, which could cause many more columns than the specified 
+PercentageLocalActivity should allow, to be active at one time.
+
+- If a column would be boosted higher, but has already reached MaxBoost, then its 
+un-connected synapse permanence values are incremented by the boost rate, but they are 
+incremented no higher than ConnectedPerm. If a column has reached MaxBoost and still needs 
+boosting because it hasn't been active, it has no hope of becoming active and so it needs 
+to change to represent a different pattern. Increasing the synapse permanence values 
+gradually gives it an increasing opportunity to represent a different pattern.
+
+Segment Updates
+===============
+UpdateSegmentActiveSynapses() has been changed to fix a few problems with the original CLA 
+whitepaper version.
+
+ - When short repeating loop patterns, such as AAAXAAAX... are given, the CLA quickly learns 
+the full pattern and every cell that makes up part of every representation is in 
+predictive state (1-step or higher) at all times. Because of this, no cell that's part of 
+any representation ever becomes truly inactive, and so no segment updates can ever be 
+negatively reinforced. To solve this, I made it so that if a cell goes from 1-step 
+predictive state to >1-step predictive state, then it negatively reinforces any segment 
+updates that are proven "incorrect" by this change in predictive state.
+
+- If a cell is put in predictive state at the same time that it is activated, then in the 
+white paper version and the OpenHTM version, the segment that put it into predictive state 
+would be positively reinforced by its simultaneous activation. This should not be the case 
+however; a prediction implies that the cell will activate in the future, not at the same 
+time. (patterns of simultaneous activation are the spatial pooler's job). 
+UpdateSegmentActiveSynapses() has been modified so that it will not process such a segment 
+update in this case; the segment update will stay in the queue until a later time step, 
+when it can be determined if the prediction (of *future* activation) came true or not.

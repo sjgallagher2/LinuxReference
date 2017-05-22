@@ -1,0 +1,115 @@
+Hardware Description Languages including VHDL and Verilog go here. There are 
+OneNote notes on running. For linux, Icarus Verilog (iverilog) and FreeHDL
+(gvhdl) are used for verilog and VHDL, respectively. For viewing waveforms,
+Icarus and GHDL might have them, or you can use GTKWave (gtkwave) to view
+the results of your simulation. 
+
+There are three steps to running a VHDL simulation. 
+	1. Analyze
+	2. Execute
+	3. Release
+First the code is analyzed for errors, then the simulation is executed, and
+finally the waveforms are released to a format that the waveform viewer can
+use. Make sure to specify the stop time when releasing. Executing is different
+from releasing, though I'm not 100% on the function of each at the moment. 
+When you execute, it is akin to compiling, and when you release, it is like
+using the compiled VHDL to run a simulation. This distinction arises because
+you have test benches and such, and you only execute the top level entity,
+then you release with everything included. 
+
+For verilog, you first Build, and then Run the simulation. In essence, the
+verification is combined with the build (I believe). The output of the build
+is a .out file from some .v files (verilog files), and is done with the
+program "iverilog -o pathblahblah". Running is done with "vvp pathblah.."
+
+
+Let's look at running verilog and VHDL simulations more properly. 
+
+VHDL	==================================
+VHDL descriptions can be located in files with the extension *.vhd or similar
+variations, depending on what makes sense to you. These are written in a text
+editor and then analyzed for errors, executed, and simulated/released. These
+steps are done with FreeHDL under the name "ghdl" or "freehdl". Other options 
+include ghdl or commercial packages. See the OneNote notes. 
+
+Visualizing is done with GTKWave under the name "gtkwave". When we are ready 
+to compile a file, say digital.vhd, we can either work through the many 
+executables that freehdl uses to compile or we can use the simpler gvhdl
+command (not to be confused with ghdl) like so:
+
+	$ gvhdl digital.vhd
+	$ ./digital
+
+This makes an executable called "digital" without an extension, and a few
+C++ files (*.cc). This happens because FreeHDL translates VHDL into C++ and
+then compiles for your simulation. Luckily, the gvhdl command takes care of
+this for us. Then we run by executing ./digital. 
+
+FreeHDL follows VHDL 93 (to the best of its ability) so keep that in mind
+when compiling and facing errors. As well, you do not need to include the
+standard VHDL header:
+	library ieee;	--NOTE necessary
+	use ieee.std_logic_1164.all;	-- NOT necessary
+In fact, when I was testing VHDL files, I couldn't get it to run if I
+used this header. Another thing to note is the use of several files. FreeHDL
+uses the last entity defined as the top-level entity, so if you're running
+a test bench, you should keep the test bench in the _same file_ as your
+entity definitions. 
+
+The digital command brings up its own command window where you can perform
+various tasks, such as simulating a cycle, running the simulation for some
+amount of time, showing signal values, and dumping the waveform data into
+a file. The commands are all listed when you run ./digital. An example flow
+is to first dump the signal waveforms, then run for 100 ns, then dump the 
+waveforms again, then quit. This will create a new file called wave.dmp
+by default, which can be changed using the "dc" command in ./digital. 
+
+	$ > dc -f digitalwaves.dmp
+	$ > d
+	$ > r 100 ns
+	$ > d
+	$ > q
+
+Finally, we view the results of our labor with GTKWave:
+	
+	$ gtkwave digitalwaves.dmp
+
+From here, you select the signals that you want to see and they appear in
+the viewer window.
+
+Note that since you're compiling and linking executables with C++, you'll
+need the associated programs to make that happen. For me, I got a linker
+error until I realized I didn't have "libtool" installed. Just a small
+note.
+
+To summarize, here's what it all looks like with a file called digital.vhd:
+
+	$ gvhdl digital.vhd
+	$ ./digital
+	====*Commands text prints out*====
+	$ > dc -f digitalwaves.dmp
+	$ > d
+	$ > r 100 ns
+	$ > d
+	$ q
+	$ gtkwave digitalwaves.dmp
+
+
+VERILOG	====================================
+Verilog can be built with Icarus verilog from *.v files. The .v files can be
+written in a simple text editor, and then the files are built and run with
+the following commands. Assume digital.v is a verilog file in the current
+directory, which is put into an output file a.out.
+
+	$ iverilog -o a.out digital.v
+	$ vvp a.out
+
+This should compile and then run your simulation for the Verilog description. 
+Don't forget that the purpose of these languages is to describe hardware, 
+so we're only _simulating_ from the output files, what the waveforms on an
+FPGA or what-have-you might look like. Simulation is not the intended purpose
+of these programs - realization of the hardware is. Just a helpful reminder. 
+
+
+
+

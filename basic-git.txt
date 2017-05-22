@@ -1,0 +1,90 @@
+Using github is an essential tool for version tracking, and working with open-source projects. It's very common
+in the developer world.
+
+It works in repositories, where people commit changes through pull requests. Repositories can be
+forked so that they can be changed without affecting the original/master version.
+
+To interface on your computer with github, you use Git. Here's how to set it up:
+This stuff sets up your name and settings:
+	git config --global user.name "JOE BLACK"
+	git config --global user.email "joe.black@gmail.com"
+
+To actually see your repos and make changes and pull requests, you can either work over:
+	HTTPS, or
+	SSH
+When working with SSH, you need a key on your computer. Working with HTTPS is the recommended method
+now. 
+
+The important commands in Git are:
+	git clone https://......			download a new repository
+	git fetch ...						sync a repo
+	git merge ...						merge remote branches with your own
+	git pull ...						sync and merge a repository
+	git push ...						push new branches to a repo
+
+Each of these is automatically going to perform its function in whatever repository you are currently
+in. The whole command will perform the given action (clone, fetch, pull, push) locally on your computer. 
+Other useful commands are:
+	git remote -v ...
+	git remote add upstream ...
+
+Git uses the root directory that you are in to act on commands. The root directories have .git files and such
+that make it so that it knows where you are. 
+For example, if you try a git command outside of a git repository, you'll get an error:
+	fatal: Not a git repository (or any parent up to mount point /home/user)
+	Stopping at filesystem boundary (GIT_DISCOVERY_ACROSS_FILESYSTEM not set).
+Notice how git tried to look all the way up the file hierarchy for the git root but didn't find it. 
+
+As an example, let's say I've found a good repo from github that I want to clone onto my local system.
+For the time being, the repository is called booksmart, and is located at https://www.github.com/bob/booksmart.
+
+To first get the repo, I call:
+	$ git clone https://www.github.com/bob/booksmart
+And then git will take care of it, placing a directory booksmart/ wherever I called the command. Going into
+this directory, I can start working with git. A few days pass before I decide to head into the repo,
+but I'm worried that I missed some updates to the code. I enter:
+	$ git pull origin master
+This will make sure that my branch is totally up to date. The 'origin' part represents the place
+that this repo came from originally, and the 'master' refers to the master branch. 
+
+Now I'm concerned, because there could be another branch on my system. How that could happen
+without me knowing is beside the point. You can avoid any confusion with:
+	$ git branch
+Now I'm concerned because I'm working with this repository and I want to make some drastic
+changes to the code, without affecting my master branch. So I make a new one:
+	$ git branch bookdumb
+Now if I run git branch I should see all my brances listed. To actually _use_ a branch that I've made,
+I check it out, using the command checkout:
+	$ git checkout bookdumb
+But maybe I wanted to simply make the branch, then check it out. Then I use the -b flag:
+	$ git check -b bookdumb
+In this way, I could cut down the two commands into one. But now, it's time to get rid of that branch,
+because it was no good in the end. I can merge, or simply delete the branch like this:
+	$ git branch -D bookdumb
+This will _force_ the deletion of the branch, regardless of whether I have merged it or not. If I want
+to avoid destroying my work without merging, I can use
+	$ git branch -d bookdumb
+instead. There is a lot to the whole 'git' thing. I suggest reading the "Git User Manual" from kernel.org.
+
+If you want to check back in time, to a certain 'release' of a project, you can set tags as you go, and
+refer back to them whenever you want. Tags are usually labelled in versions, such as V2.0.1 or 
+simply 3.2.3. To access and create tags, use
+	$ git tag
+You can then checkout these versions, as opposed to different branches. The branches you create have a 
+"head", which is the version of the project that your branch jumps off of. 
+
+Sometimes you want to simply visualize all the different changes over time, instead of working with
+git internally. To do that, you use:
+	$ gitk
+This is a visual git program that runs with KDE (or GTK, not sure)
+
+Finally, software is typically released as a .tar.gz file, which is a zip format. To make a release using
+one of the versions of your project as a .tar.gz, you can run:
+	$ git archive -o booksmart1.5.7.tar.gz master
+or
+	$ git archive -o booksmart1.5.7.tar.gz --prefix=booksmart/ master
+Which will put all the files in another folder called "booksmart" which acts like the big owner of
+everything. Other good things to do are to make change logs, which show how the project has changed.
+
+Again, more information on Git can be easily found at www.kernel.org/pub/software/scm/git/user-manual.html
+Happy git-ing.

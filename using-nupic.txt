@@ -1,0 +1,74 @@
+NuPIC is the Numenta Platform for Intelligent Computing, which is based off of the HTM algorithm. Nupic is
+written mostly in Python, though there is another version being written in C++. The project exists in 
+a number of places, namely github (Numenta/Nupi) and PyPI (nupic.bindings and nupic). The github source is
+used for compiling, and stores some of the nupic files in a folder called nupic/
+
+The rest of the files are bindings and python files hidden away in the .local/ folder, which is sort of a
+pain to really get into. 
+
+To actually download nupic, you can get everything you need from a) git clone ... or b) pip nupic
+Pip is a tool for pulling programs that are stored in the Python Package Index (PyPI). Obviously,
+you'll need to get pip before you can download those. That's the easiest way anyway.
+
+Nupic is kept up on PyPI, so to be able to use the python libraries, and have them ready-to-go,
+you can simply use pip to download it. There are two parts: the main nupic files, and the nupic C
+bindings, which come from nupic.core, an implementation of nupic algorithms written in C. The bindings
+are required because nupic depends on certain algorithms that only exist in C, and python cannot 
+immediately use things written in C. 
+
+The source code is managed on Github, at Numenta/nupic and Numenta/nupic.core. You can clone those
+repos and start digging in. 
+
+You also need MySQL, because some processes in Nupic require access to a database server. You can get
+mysql fairly simply, but I've always had trouble starting the server process. See "starting-mysql"
+for information on how to do that.
+
+Then you should (but are not required to) set an environment variable $NUPIC which points to the root
+directory of nupic. You can put the definition in a .bashrc file so it is always around, and it makes
+accessing nupic easier. This is _only_ required if you cloned the nupic repo. Otherwise, you're okay.
+
+In case you want to see the version, location, or what-have-you of anything from pip, you can simply
+run:
+	$ pip show nupic			or...
+	$ pip show nupic.bindings
+And it'll show you version information, file location, author, etc.
+
+Typical use of Nupic involves starting with a data file in the .csv format. So for example, something from
+an Excel file saved as .csv. There are formatting quirks to this. Then you "swarm" over this by making two
+files: swarm.py and swarm_description.py. They are both formatted quite specifically, and the formatting
+changes as the software develops, so see the Wiki at Nument/Nupic on Github.
+
+After you swarm, you will find that you have a new 'model' file, which will tell the nupic algorithm how
+to run with your data. Then you just have to make a file that will perform the algorithm, perhaps calling
+it "run.py".
+
+There's of course a lot going on with the algorithm, the software structure, and the interface. This isn't
+really the best place to get into it. But here we go. This assumes you're familiar with HTM, the CLA, and
+how things fit together. 
+
+Nupic uses something called "opf" which stands for Online Prediction Framework. It's not super important
+right away, but it comes up a lot in the source, and is worth noting.
+
+================================================
+Algorithm Variables
+================================================
+
+There are a lot of "customizables" in the CLA, which you can work with. Nupic has its own way of 
+representing these variables, and as some default values, that are relevant.
+
+* Number of columns = N = 2048
+* Number of cells per column = M = 32
+* Number of active bits = w = 41
+* Sparsity = w/N = 2%
+* Dendritic segment activation threshold = theta = 15
+
+* Initial synapse permanence = 0.21
+* Synapse permanence inc/dec = +/- 0.1
+* Synapse permanence decrement for predicted inactive segments: 0.01
+* Maximum number of segments per cell: 128
+* Maximum number of new synapses added at each step: 32
+
+So you can see that the letters N, M, w, and theta appear, while others don't get one particular
+name. 
+
+
