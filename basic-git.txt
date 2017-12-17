@@ -17,7 +17,7 @@ now.
 
 The important commands in Git are:
 	git clone https://......			download a new repository
-	git fetch ...						sync a repo
+	git fetch ...						sync a repo's branches and tags
 	git merge ...						merge remote branches with your own
 	git pull ...						sync and merge a repository
 	git push ...						push new branches to a repo

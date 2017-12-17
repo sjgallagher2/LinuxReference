@@ -1,0 +1,264 @@
+\documentclass{article}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{scrextend}
+\usepackage{dirtree}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.58,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+	language=bash,
+	aboveskip=3mm,
+	belowskip=3mm,
+	showstringspaces=false,
+	columns=flexible,
+	basicstyle={\small\ttfamily},
+	numbers=none,
+	numberstyle=\tiny\color{gray},
+	keywordstyle=\color{blue},
+	commentstyle=\color{dkgreen},
+	stringstyle=\color{mauve},
+	breaklines=true,
+	breakatwhitespace=true,
+	tabsize=3
+}
+
+\title{Linux Overview}
+\date{18 Sept 2017}
+\author{Sam Gallagher}
+
+\begin{document}
+	\pagenumbering{gobble}
+	\maketitle
+	\newpage
+	\pagenumbering{arabic}
+	\section{Flavors and Distros}
+	
+	\section{Terminal}
+	The \textbf{terminal} is one of the most valuable tools you have in linux. The terminal itself is a unix program called \textit{tty}, which stands for \textit{teletype} terminal. A teletypewriter was the predecessor to the modern keyboard, and the terminology has stuck ever since. Because a proper teletype terminal would involve a teletypewriter and video terminal, modern terminals are actually \textit{terminal emulators}. 
+	
+	There are many terminal emulators available, depending on your distribution of linux. You can easily install a new terminal emulator with extra features if you are not satisfied with your distribution's default terminal. Some of the most common terminal emulators are:
+	\begin{itemize}
+	\item GNOME Terminal (Default for GNOME)
+	\item Konsole (Default for KDE)
+	\item xterm (Default for X Window System)
+	\item rxvt
+	\item Guake
+	\item Yakuake
+	\item Xfce
+	\item mintty (Default Cygwin terminal)
+	\end{itemize}
+	
+	The first three in the list are default terminals that come preinstalled, while the rest are popular for the features and workflow they provide. For example, drop down terminals are activated with a particular hotkey, some terminals allow multiple screens, etc. The term \textit{console} can generally be used interchangeably with terminal, the difference being the history of the terms. 
+	
+	A \textbf{shell} is a generic term for an interface which a user sends commands through. In unix (and therefore linux) a shell typically refers to the software interface between the user and the operating system kernel and other low level components. The shell acts as a scripting language and a command line language, and it works very closely with the terminal emulator to allow user interaction with the system. For example, when a user presses a key in a terminal emulator, the terminal receives the keypress and the shell converts this into a command (such as backspace, or appending a letter). Essentially, the shell receives parameters from devices or programs, and issues commands to a terminal or to the operating system. 
+	
+	The most common shell in unix is the \textbf{bash} shell which is derived from the Bourne shell. When a command is issued to the terminal such as
+	\begin{lstlisting}
+	$ tar -xvf mycompfile.tar
+	\end{lstlisting}
+	The command is supplied in Bash format, with a command (tar), flags (-x, -v, and -f) and an input file (mycompfile.tar). A bash script is shell script, a file with commands supplied in the bash language. This begins with the location of the bash program, and then continues with the commands.
+	\begin{lstlisting}
+	#!/bin/sh
+	echo "Hello world"
+	\end{lstlisting}
+	
+	Note that the bash program is called "sh" and is located in "/bin/". We'll talk more about files and the filesystem in the next section. 
+	
+	There are many commands used in the terminal to navigate the file system, modify files and programs, change permissions, and so on. Some of the most fundamental commands are:
+	\begin{itemize}
+	\item cd, change directory
+	\item ls, list files
+	\item pwd, print working directory
+	\item man, read the manual for a program
+	\item cp, copy a file
+	\item mv, move a file
+	\item mkdir, Make a directory
+	\item chmod, change mode (for a file or folder, refers to permissions)
+	\item chown, change owner
+	\item rm, remove a file
+	\item cat, stands for "concatenate", prints out a file
+	\item grep, search a file or output
+	\item wget, web get, downloads a remote file
+	\item less, prints a file in its own viewer to browse without taking up terminal space
+	\item tail, prints the tail, or end, of a file or output
+	\item w, lists active users
+	\item sudo, stands for superuser do, gives admin privilege for the current command
+	\end{itemize}
+	
+	Familiarizing yourself with these commands and their options is essential to using linux, or any unix-based operating system. 
+	
+	\subsection{Commands}
+	\subsubsection{cd}
+	Change directory.
+	
+	Usage:
+	\begin{lstlisting}
+	cd
+	cd [directory]
+	cd ~
+	cd .
+	cd ./
+	cd ..
+	cd ../
+	cd ../../../
+	cd -
+	\end{lstlisting}
+	
+	\subsubsection{ls}
+	List directory.
+	
+	Usage:
+	\begin{lstlisting}
+	\end{lstlisting}
+	
+	\subsubsection{pwd}
+	Print working directory.
+	
+	Usage:
+	\begin{lstlisting}
+	\end{lstlisting}
+	
+	\subsubsection{cp}
+	Copy file.
+	
+	Usage:
+	\begin{lstlisting}
+	\end{lstlisting}
+	
+	\subsubsection{mv}
+	Move file.
+	
+	Usage:
+	\begin{lstlisting}
+	\end{lstlisting}
+	
+	\subsubsection{rm}
+	Remove file.
+	
+	Usage:
+	\begin{lstlisting}
+	\end{lstlisting}
+	
+	\subsubsection{cat}
+	Concatenate file to terminal.
+	
+	Usage:
+	\begin{lstlisting}
+	\end{lstlisting}
+	
+	\subsubsection{grep}
+	Globally search a Regular Expression and Print.
+	
+	Usage:
+	\begin{lstlisting}
+	\end{lstlisting}
+	
+	\subsubsection{chmod}
+	Change file Mode.
+	
+	Usage:
+	\begin{lstlisting}
+	\end{lstlisting}
+	
+	\subsubsection{chown}
+	Change file Owner
+	
+	Usage:
+	\begin{lstlisting}
+	\end{lstlisting}
+	
+	\subsubsection{wget}
+	Web get.
+	
+	Usage:
+	\begin{lstlisting}
+	\end{lstlisting}
+	
+	\subsubsection{less}
+	Print a file in a buffer.
+	
+	Usage:
+	\begin{lstlisting}
+	\end{lstlisting}
+	
+	\subsubsection{tail}
+	Print the tail end of a file.
+	
+	Usage:
+	\begin{lstlisting}
+	\end{lstlisting}
+	
+	\subsubsection{w}
+	List active users. 
+	
+	Usage:
+	\begin{lstlisting}
+	\end{lstlisting}
+	
+	\subsubsection{sudo}
+	Superuser do.
+	
+	Usage:
+	\begin{lstlisting}
+	\end{lstlisting}
+
+	\section{Filesystem}
+	The linux/unix filesystem is quite different from the Windows filesystem. There are no "drives" like C:, but rather there is a root directory called / which is the root of all files and directories in the system, including system files, user home directories, and libraries and programs. The filesystem is accessed by \textbf{users} which are part of \textbf{groups} that control who has access to what, the \textit{permissions}. Just like users have passwords, groups can have passwords, and groups can have owners as well. We'll see more about users, groups, and permissions later on. 
+	
+	The general structure of a unix filesystem is as follows. \\
+	\dirtree{%
+	.1 /.
+	.2 bin/.
+	.2 boot/.
+	.2 cdrom/.
+	.2 dev/.
+	.2 etc/.
+	.2 home/.
+	.3 sam/.
+	.2 lib/.
+	.2 media/.
+	.2 opt/.
+	.2 proc/.
+	.2 root/.
+	.2 run/.
+	.2 sbin/.
+	.2 srv/.
+	.2 sys/.
+	.2 tmp/.
+	.2 usr/.
+	.2 var/.
+	}
+
+
+	This is the root directory, /, and the entire filesystem stems from this point. The user that logs on typically finds him or herself in the /home/username/ directory, where username is the user's username, like 'sam' above. The root, /, is the \textbf{mount point} for the file system, and the file system is said to be \textbf{mounted} when it is in use. This is because a hard disk could contain many different formats of filesystems - for example a Windows filesystem and a unix filesystem. A given filesystem is simply a section in memory, and \textit{mounting} the filesystem means telling the operating system what type of filesystem it is, where it is, and how to use it. 
+	
+	A brief review of directories listed above and their contents and usage is in order. 
+	\begin{labeling}{/var/}
+	\item [\textbf{/bin/}] Essential command binaries
+	\item [\textbf{/boot/}] Bootloader files and programs
+	\item [\textbf{/dev/}] Virtual filesystem for devices
+	\item [\textbf{/etc/}] System-wide configuration files
+	\item [\textbf{/home/}] All user home directories
+	\item [\textbf{/lib/}] Static and dynamic library files for linux
+	\item [\textbf{/media/}] Mount points for USB drives and other media
+	\item [\textbf{/mnt/}] Temporarily mounted filesystems
+	\item [\textbf{/opt/}] Optional application packages
+	\item [\textbf{/proc/}] Virtual filesystem for processes, hardware status, etc
+	\item [\textbf{/root/}] Home directory for root user
+	\item [\textbf{/run/}] Run-time variable data
+	\item [\textbf{/sbin/}] Essential system binaries
+	\item [\textbf{/srv/}] Site-specific data served by the system
+	\item [\textbf{/sys/}] Information about devices, drivers, some kernel features
+	\item [\textbf{/tmp/}] Temporary files
+	\item [\textbf{/usr/}] Secondary hierarchy for read-only user data
+	\item [\textbf{/var/}] Variable files, expected to change continuously, such as logs, etc
+	\end{labeling}
+	
+	\section{Software}
+	\section{Devices and Drivers}
+\end{document}

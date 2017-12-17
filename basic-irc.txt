@@ -1,0 +1,64 @@
+SHORT VERSION
+IRC chats are cool, worth knowing how to use. I use the irssi client, run it with
+	$ irssi
+Connect to Freenode or some other network with /connect
+	$ /connect chat.freenode.net
+Nickname registration/identification is done through the NickServ account
+	/msg NickServ identify <password>
+View your personal messages with the /q command
+	/q NickServ
+	/query NickServ
+q is short for query. 
+
+Connect to a channel with
+	/connect #somechannel
+And leave the channel with
+	/leave
+Exit irssi with /quit. 
+
+Using Alt+<key> will help you navigate. So will PgUp and PgDown buttons. 
+
+MORE DETAILS
+How does IRC work and how do you use it? We have a hierarchy structure, which is made up of:
+	Client software (irrsi)
+	Network (Freenode)
+	 -> Servers
+	Channel
+
+You access IRC networks through a client, such as irssi or WeeChat. Your client software can actually have you
+create a settings file, setting up a user name and password, and things like that. The client is responsible
+for connecting you to IRC networks which are made up of a number of servers. A network contains many different
+channels, which is where you actually chat with people. When you join a network, you should register a nickname,
+and this nickname is specific to you, on a particular network. So if you're on Freenode, you could have one
+nickname, and if you're on Mozilla you could have another. 
+
+The most common networks are Freenode, Mozilla, and OFTC. Freenode is probably the most popular, hosting many
+thousands of channels. The network you're on typically has little to do with the channels that are on the
+network. Anyone can make a channel on a network, depending on the rules of the network of course. 
+
+When you're on a network, you have a nickname, and the option of typically thousands of channels for different
+groups and projects. From there, it's all fair game. You don't need that many networks, I've only been on
+Freenode for example. You can also run an IRC server on your own computer as a small network that follows
+your rules. Typically, you have to register your nickname on the network with a nickname bot. You can also set
+a password for your nick. 
+
+How do you do things? Commands start with / and you can see the available commands with /help. Some other
+commands:
+	/attach chat.freenode.net		Connect to Freenode network
+	/nick sjgallagher2				Set your nickname (not the same as registering which is network specific)
+	/join #en.wikibooks				Join a channel (here it is en.wikibooks)
+	/whois sjgallagher2				Find information on a user or nickname
+	/clear							Clear channel's text
+	/away Reason for being away		Send away message and tell people you're away
+	/me loves cake 					Sends a signal with an action, like "sjgallagher2 loves cake"
+	/leave							Leave the channel
+	/quit							Exit IRC, or disconnects from the network
+
+Now, how do you find a channel? Generally, it'll be listed e.g. on a project page or forum, or someone will make
+a channel and give you the name to access. You can search for channels with the alias program.
+
+Making new channels is specific to the network. For example, Freenode has groups which are registered with
+Freenode as an organization, and these groups can own channels. There are also topical channels that are still
+on-topic for Freenode (which they describe as open-source projects, academic projects, etc). 
+
+

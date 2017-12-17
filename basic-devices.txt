@@ -1,0 +1,147 @@
+Note: These notes borrow from Joe Shaw among others. 
+
+Devices are central to your computer, because if we're being honest, your computer is a device. On Linux we have
+a few tools and files to help us understand what devices are doing what where, and how, and how we can use that
+information to really crank up the customization of your computer. 
+
+I'm running Debian 9 (Stretch). Let's get started. 
+
+In C/C++, all devices are -files-. The hard disk is a file, the keyboard is a file, etc. C/C++ has an interface
+that, as long as you can fit into it, will allow you to access these devices as if they were hard disk files that
+you're used to (if you're unfamiliar with this aspect of C/C++). Since Linux is written in C, devices are files.
+
+A few topics we'll be covering:
+	Locations of things
+	hal, udev, and dbus
+	ioctls
+	dmesg
+	hwinfo
+	systemd and journalctl
+
+Device files are typically located in the /dev/ directory, and you'll find there things like your hard disk (sda
+or similar), mounted flash drives, USB devices, serial devices, terminals, wireless interfaces, and the like. Now,
+wireless is not going to be covered here, because it's its own animal. 
+
+The input system is made up of the device drivers, and the event drivers. Device drivers are in charge of
+interfacing with the hardware itself, while event drivers relay the talking points to the userspace. The evdev 
+interface is the one used to drive events in most Linux systems now. You can get the evtest package to take
+a look at things with evdev. It creates character streams which are stored in /dev/input. The files are called
+eventN where N is some number. 
+
+udev is the device manager in Linux, and it manages the /dev/ directory as a whole. udev helps keep the device
+system flexible and dynamic, by taking meaningless names from the kernel and making them more useful names
+that you'll see in /dev/.
+
+At the heart of the linux window system is X, which can be found going by the name Xorg. X is a window manager,
+and window systems like GNOME and KDE are typically framed on top of X. Within X are few hardware drivers and
+event drivers, including evdev (from before), synaptics (not the Synaptic package manager), and joystick. Now,
+to be clear, Xorg is actually an implementation of the X filesystem (X11 at the moment), which itself is a
+server run on the computer. 
+
+By the way, all of these files and processes and interfaces will have man pages, so something like
+	$ man Xorg
+Will bring up the Xorg manual which is obviously really helpful when you come across things you don't know. 
+
+While evdev handles basic hardware inputs from keyboards, mice, and the like, the synaptics driver is more geared
+towards higher level features like two-finger scrolling, touch screens, etc. 
+
+Okay let's do something with all of this information. First, make sure hwinfo and evtest are installed, or install
+them with apt. hwinfo is a command which lists hardware information that is found in /sys/ and other places. We
+can run it with a filter such as --keyboard to see what kind of keyboard hardware we have, what driver it's
+using, and what event file we can find it under. 
+	$ sudo hwinfo --keyboard
+
+21: PS/2 00.0: 10800 Keyboard
+[Created at input.226]
+Unique ID: nLyy.+49ps10DtUF
+Hardware Class: keyboard
+Model: "AT Translated Set 2 keyboard"
+Vendor: 0x0001 
+Device: 0x0001 "AT Translated Set 2 keyboard"
+Compatible to: int 0x0211 0x0001
+Device File: /dev/input/event0
+Device Number: char 13:64
+Driver Info #0:
+	XkbRules: xfree86
+	XkbModel: pc104
+Config Status: cfg=new, avail=yes, need=no, active=unknown
+
+So we have our device name (AT Translated Set 2 keyboard), device file for events (/dev/input/event0), and some
+driver information (xfree86 for rules, pc104 for model). We can put the device file to immediate use by using
+evtest. evtest will dump data from the device so you can see what's happening. There are options that you can
+see in the man page. 
+	$ evtest /dev/input/event0
+
+First, evtest will display a key for interpreting things. Then it will give you raw data from the keyboard. 
+Luckily, you don't need to interpret much. If you try typing things on your keyboard, you will see the events
+come through, which is quite good! Get out of it with ctrl+c (^C). 
+
+This should give you a base from which you build up an understanding of evdev and other events. You can interact
+with these events (though it can be dangerous...) through C/C++. The /usr/lib/Xorg libraries should help. I say
+it could be dangerous because, obviously, keyloggers are a thing used all the time to get information from people. 
+Linux is pretty secure, and the fact that it has only a small marketshare means it is not often targeted by things
+like malware, and privileges make sure only the admin can access these event device files, but it's always good 
+to keep security in mind. 
+
+A look at the /dev/ directory can tell a lot.
+/dev/
+	block/		.
+	bsg/		.
+	bus/		.
+	char/		.
+	cpu/		.
+	disk/		.
+	dri/		.
+	input/		evdev eventN files
+	mapper/		.
+	mqueue/		.
+	net/		.
+	pts/		.
+	shm/		.
+	snd/		.
+	usb/		.
+	v4l/		.
+	console		.
+	fb0			.
+	full		.
+	fuse		.
+	hidraw		.
+	hpet		.
+	hugepages	.
+	iio:device	.
+	kmsg		.
+	kvm			.
+	log@		.
+	loop-control	.		
+	mcelog		.
+	media0		.
+	mei0		.
+	mem			.
+	memory_bandwidth	.
+	null		.
+	port		.
+	ppp			.
+	psaux		.
+	ptmx		.
+	random		.
+	rfkill		.
+	rtc			.
+	sda			.
+	sg			.
+	snapshot	.
+	stderr@		.
+	stdin@		.
+	stdout@		.
+	tty			.
+	uhid		.
+	uinput		.
+	urandom		.
+	vcs			.
+	vcsa		.
+	vfio		.
+	vga_arbiter	.
+	vhci		.
+	vhost-net	.
+	video		.
+	watchdog	.
+	zero		.
