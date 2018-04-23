@@ -55,7 +55,8 @@ commands:
 	/quit							Exit IRC, or disconnects from the network
 
 Now, how do you find a channel? Generally, it'll be listed e.g. on a project page or forum, or someone will make
-a channel and give you the name to access. You can search for channels with the alias program.
+a channel and give you the name to access. You can search for channels with the alis program.
+	/msg ALIS list *searchphrase*
 
 Making new channels is specific to the network. For example, Freenode has groups which are registered with
 Freenode as an organization, and these groups can own channels. There are also topical channels that are still

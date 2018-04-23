@@ -1,0 +1,48 @@
+iproute2 is a package of networking programs. These include:
+	ip
+	ss
+	bridge
+	rtacct
+	rtmon
+	tc
+	ctstat
+	lnstat
+	nstat
+	routef
+	routel
+	rtstat
+	tipc
+	arpd
+	devlink
+We'll be covering a few of these in this document, namely the many ip- commands that have
+replaced net-tools commands. The "objects" for ip are:
+	ip link				Network device
+	ip address			Protocol address on a device
+	ip addrlabel		Label configuration for protocol address selection
+	ip route			Routing table entry
+	ip rule				Rule in routing policy database
+	ip neigh			Manage ARP or NDISC cache entries
+	ip ntable			Manage the neighbor cache's operation
+	ip tunnel			Tunnel over IP
+	ip tuntap			Manage TUN/TAP devices
+	ip maddress			Multicast address
+	ip mroute			Multicast routing cache entry
+	ip mrule			Rule in multicast routing policy database
+	ip monitor			Watch for netlink messages
+	ip xfrm				Manage IPSec policies
+	ip netns			Manage network namespaces
+	ip l2tp				Tunnel ethernet over IP
+	ip tcpmetrics		Manage TCP Metrics
+	ip token			Managetokenized interface identifiers
+	ip macsec			MACsec device configuration
+
+Obviously there are a bunch of these, so let's get started! A lot of this will revolve around
+your wireless devices, which are something like wlp8s0, enp7s0, and lo. On an older system they might
+look something like wlan0, and eth0. The former are systemd naming conventions while the latter are
+simply traditional conventions. The device manager is called udev, for userspace /dev, and this will 
+also come up a fair amount. 
+
+The new naming scheme consists of two letters for a device type (wl=WLAN, en=Ethernet) followed by
+a location. The p standards for PCIe, for example PCIe bus 7, and the s standards for slot.
+
+

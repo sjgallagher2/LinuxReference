@@ -1,0 +1,80 @@
+Installing linux can be a pain, and as I find myself needing to move machines or change OSs more frequently,
+I'm going to make a document explaining how to get everything working. 
+
+INSTALLING
+Start by copying all your files you want to keep from Home or var or etc or wherever. I usually just go with
+home. Boot a GParted linux distro from USB, and make space for your new system. Make a USB drive with unetbootin
+and make sure you add non-free/commercial drivers/firmware. The best way to do this is to find a distribution
+that has the firmware already, but you can also use a firmware package and extract it into Firmware on the USB 
+drive after you have already extracted the ISO to the USB drive. That should do it. 
+
+SETTING UP LINUX
+Add your user to the sudo group by going into single user mode, and adding the user to the group.
+	$ su
+	$ usermod -a -G sudo sam
+"-a" is "append" and "-G sudo" is the group, then "sam" is the username. You'll probably still get an error about
+not being in the sudoers file if you try to run sudo, so you can make absolutely sure it works by adding your
+username to sudoers. Go to /etc/ and again enter single user mode. 
+	$ su
+	$ cd /etc
+	$ visudo
+"visudo" should open sudoers for editing. Add the following below "%sudo ALL=(ALL:ALL) ALL":
+	sam		ALL=(ALL:ALL) NOPASSWD:ALL
+That should work for a user named "sam". 
+
+Install all your favorite packages. Some basic packages I recommend:
+	vim
+	python
+	python-pip
+	python3
+	python3-pip
+	gcc-arm-none-eabi
+	krusader
+	texlive
+	texstudio
+	chromium
+	pychess
+	scid
+	iverilog
+	libgsl-dev gsl-bin
+	octave (not sure if ppa is up-to-date)
+	shutter
+	wine
+
+And these packages in the Downloads folder:
+	google chrome
+	qucs
+	dia
+	FreeCAD
+	ArgoUML
+	Visual Studio Code
+	apr-1.6.2
+	apr-util-1.6.0
+	Eclipse
+	EECalc
+	ghdl
+	goptical
+	Matlab
+	Mendeley desktop
+	npgspice
+	node
+	openbabel
+	opencascade
+	stlink
+	stockfish-9
+	yEd
+	xflux
+
+You'll have to change a few permissions on files so that you can use them. Some executables need execution
+permission, some library files need to be accessible, sometimes sweeping changes to permissions need to be made.
+You can give the admin, all groups, yourself, and others (?) execution permission with:
+	$ sudo chmod +x filename
+
+Now you should set up the touchpad for your laptop by going to Settings->Mouse and Keyboard. You can also do this
+by editing the xorg.conf or conf.d file or whatever, but - por que?
+
+Other things you'll probably want to do include adding symbolic links, and adding desktop icons to binaries so
+that you can see them in the "Activities" screen. 
+
+After that's done, you'll want to get some GNOME plugins, including the one where you can move the mouse to the
+left of the screen and get a dock to pop up, which I find particularly nice, called Dash to Dock. 

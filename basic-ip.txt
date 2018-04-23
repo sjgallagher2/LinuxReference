@@ -1,0 +1,244 @@
+The Internet Protocol (IP) is made up of an endless number of acronyms, ambiguous terminology, arbitrary formats,
+data dumps, and the like. Connecting and interacting with the internet involves hardware and software on many
+levels of abstraction. We're not going into the OSI model here, we're just going to look at internet protocols.
+
+==== IDENTIFIERS ====
+Identification is as important in the IP suite as it is in the mail system - without somewhere to go, data
+cannot be delivered, and this information is returned to the sender. Different protocols involve different
+"addresses" which can be used at various levels of abstraction. The two most important addresses used in the
+internet are: 
+
+	Logical Address (IP Address)
+	Physical Address (MAC Address, also known as the Ethernet Address or Hardware Address or burned-in address)
+
+The physical address of a network interface controller (NIC, also known as a network interface card, network
+adapter, LAN adapter, or physical network interface) is assigned to the hardware itself, and is used to identify
+the hardware to the network. MAC stands for Media Access Control, and the MAC address can change as long as the 
+hardware supports it. 
+
+The logical address (the IP address in most cases) is used to identify an actual computer (as opposed to the
+network interface) to the network. While MAC addresses are wholly unique to hardware, IP addresses of computers
+on the same local network can share much of the address. In effect, computers that are close to one-another can
+have similar IP addresses. 
+
+It's worth noting that a "local network" is often the group of computers which are connected to the same router. 
+It is not usually noticeable, but accessing a computer that is in your local area network (e.g. another computer
+connected to the same router) is much simpler than accessing a computer on a different local network. 
+
+Okay let's look at examples, from my own computer.
+	IP Address:
+		IPv4 (Private)	192.168.1.189
+		IPv6 (Private)	fe80::86a2:703:779:dfd2
+		IPv4 (Public)	23.30.117.182
+		IPv6 (Public)	Not supported
+		MAC (Ethernet)	30:8d:99:1c:04:dc
+		MAC (WLAN)		34:02:86:47:cd:22
+
+A few points to make here. First, there are two IP addresses for my computer. The first is the private network
+IP address (both IPv4 and IPv6) and the second is the public IP address (only IPv4). The two versions of the
+IP address are version 4 and version 6 (version 5 was short lived); IPv4 was the original 32 bit number
+and IPv6 is an updated 128 bit number. IPv4 worked until addresses started running out, which resulted in the push
+for IPv6 addresses.
+
+The first part of the private IPv4 address is 192.168., and this is actually a -reserved- IP address, used
+specifically to identify a computer on the local private network. The IPv6 address fe80:: is also reserved, for
+a local link. The use of the 192.168.XXX.XXX format allows computers on a private network to identify each other
+using only the last four digits of the address. For a given local network, the -subnet mask- specifies the 
+unused parts of the IP address. A subnet mask might be specified by 255.255.255.0, where 255 means this part
+of the address can be ignored. 
+
+Other reserved IPv4 addresses include (where X is any number 0-255):
+	0.X.X.X						Used for broadcast to the current machine
+	10.X.X.X					Local communication in a private network
+	100.64.X.X - 100.127.X.X	Communication between a service provider and its subscribers
+	127.X.X.X					Local host address (loop back to this computer)
+	169.254.X.X					Link-local addresses when no IP address is otherwise specified
+	172.16.X.X - 172.31.X.X		Local communications in a private network
+	192.168.X.X					Local communications in a private network
+
+Similarly, reserved IPv6 addresses are:
+	::1							Local hoost (loop back)
+	64:ff9b:X.X.X.X				IPv4 address in IPv6
+	fc00:: - fdff:ffff:ffff:ffff:ffff:ffff:ffff:ffff	Local communication in a private network
+
+For example, 127.0.0.0 is the local host (where a host is any node in a network such as a computer, router, etc).
+IP addresses are assigned by the Internet Assigned Numbers Authority (IANA) which works through regional
+Internet registries (RIRs) which in turn assign addresses through e.g. internet service providers (ISPs). 
+
+IP addresses can be static or dynamic. When a computer turns on or connects to a network, it may be assigned a
+unique IP address automatically - this is a dynamic IP address. Conversely, the computer can have a static IP
+address, which is fixed. No matter what, while a computer is connected to a network its IP address remains the
+same; how that address is assigned at startup is what changes. 
+
+The assignment of IP addresses is often done by the Dynamic Host Configuration Protocol (DHCP) from a network
+server, or through a self-configuration such as Zeroconf. DHCP-assigned addresses usually have an expiration
+after which the computer can be reassigned the address (if it is still on) or the address can be reused for
+another computer.
+
+When it comes to directing the flow of information, a computer will send its local private network data through
+to other computers using the router. If the IP address in a packet does not match a private network format,
+though (such as 192.168.0.82), it will be sent to the local network's -gateway-. A gateway is a general term
+for the interface between a local network and the rest of the internet (or any routed network). This is also
+done by the router, and is essential to the router's operation. 
+
+Interestingly enough, when two hosts on a network (e.g. two computers or a computer and router etc) have the
+same IP address, serious problems can occur. Normally, connectivity for the two hosts is cut off, and when the
+gateway and another host have the same address the network can completely fail.
+
+Now let's move to MAC addresses. My computer had two MAC addresses, one for the Ethernet interface and
+one for the WLAN (Wireless Local Area Network) interface.
+	MAC Address (Ethernet)	30:8d:99:1c:04:dc
+	MAC Address (WLAN)		34:02:86:47:cd:22
+This is expected, as there are two hardware interfaces and each (being unique pieces of hardware) should have
+its own MAC address. 
+
+The format of a MAC address is a 48 bit number, printed in 6 "octets", where the first three represent the
+Organizationally Unique Identifier (OUI) for the manufacturer of the hardware and the last three represent
+the hardware itself, in any manner the manufacturer wishes. In the case of my hardware, the Ethernet NIC shows
+an OUI of 30:8d:99 while the WLAN NIC shows 34:02:86. Using a lookup website, we find:
+	30:8d:99	Hewlett-Packard
+	34:02:86	Intel Corp.
+And this is, of course, correct with respect to the hardware in my computer. 
+
+There are many formats for a MAC address. This 48 bit number follows the IEEE standard MAC-48, but nearly
+identical are the EUI-48 (Extended Unique Identifier, used for hardware other than network interfaces) and
+EUI-64, the 64-bit improvement on EUI-48. IEEE largely considers MAC-48 to be an outdated term, and prefers
+EUI-48. A 48-bit EUI can be converted to EUI-64 by adding two ff bytes after the OUI. 
+
+The notation with colons (ff:ff:ff:ff:ff:ff) is called Unix notation, while the EUI-48 specification uses dashes
+(ff-ff-ff-ff-ff-ff). Still other notations include Cisco style with dots and two-byte groups (ffff.ffff.ffff)
+and no-delimeter style without any delimeter (ffffffff).
+
+An interesting point here is that tracking of individuals is possible by monitoring their MAC addresses as they
+move about; this is, according to Edward Snowden, used by the NSA to track everyone in a city.
+
+One final type of identifer is an SSID (Service Set Identifier), which is specific to IEEE 802.11 (Wi-Fi). This
+identifies a WLAN using a sequence of 0-32 bytes. For example, when you "connect to the Wi-Fi" you are selecting
+the SSID of the wireless local network. Often, the SSID is interpreted as a series of characters, but SSIDs
+do not have to be human-readable. 
+
+Examples of SSIDs that come default from manufacturers are:
+	Linksys
+	xfinitywifi
+	NETGEAR
+	dlink
+	default
+	etc...
+Many people change the SSID to be something like "Home".
+
+There are issues with SSIDs. For example, anyone can see the SSID and connect to the associated network if
+there is no security. As well, open networks (those without security) such as a starbucks SSID can be used
+to have someone's phone or laptop automatically connect to an insecure network set up by an attacker, because
+the computer may "remember" the network. 
+
+Hidden networks do not display their SSIDs to devices, and instead the host that wishes to connect must input
+the SSID directly. This is not completely secure, as packet sniffing allows someone outside the network to
+find the SSID by looking at traffic through the router. 
+
+There are many security options, but that's a topic for another day.
+
+Protocols in the IP suite related to IP addresses and MAC addresses include:
+	ARP		Address Resolution Protocol, IPv4, find the MAC address of a machine from its IP address
+	NDP		Neighbor Discovery Protocol, IPv6, same as ARP
+	RARP	Reverse Address Resolution Protocol, find the IP address of a computer from the MAC address of its
+			hardware
+	InARP	Inverse ARP, used to find the IP address associated with a local Frame Relay data link ID
+	DHCP	Dynamic Host Configuration Protocol, used to orchestrate dynamic IP addresses and internet usage
+	BOOTP	Bootstrap Protocol
+The ARP protocol is essential to the IP suite, and makes up a lot of traffic you see when sniffing packets. 
+Computers typically keep a table of mappings of IP addresses to MAC addresses, called the ARP cache. This can
+be accessed with the arp command. 
+
+ARP sends out a request for an address, and the machine of interest replies with its MAC address. This can 
+lead to ARP spoofing, where someone else replies with their own MAC address to get data sent through them 
+before the destination host. Another common operation is using an ARP proxy. This is when one machine replies
+to an ARP request for another, to which it forwards data. For more information on that, look into proxy servers.
+
+When machines want to inform others on the network of a change in addresses, they use a gratuitous ARP - basically
+an unrequested announcement of the MAC address associated with their IP address. 
+
+Neighbor Discovery Protocol (NDP) is the same as ARP, but for IPv6, and RARP is a reverse ARP request. RARP is 
+largely obsolete now. 
+
+The last topic for identification of information and the directing of information is the port, or socket. Because
+your network interface is handling so much traffic for so many different protocols, it needs to keep things
+organized. To do this, the communication works through a socket - the object the communication stack uses to
+carry on the conversation. 
+
+A socket is "made up" in that it is specific to the local machine, and the socket acts as an endpoint of the
+network exchange of data for the local machine. Sockets are represented by a number such as 24, 80, 8080, etc.
+Generally, any number between 1 and 65535 can be a socket identifier. In order for communication to take place,
+a socket must be assigned and the network stack (usually internal to the OS) must be aware of the choice. Then
+communication should take place through that socket. 
+
+A process on a machine connects through a network by 'binding' to a socket, claiming that socket in a way. It
+receives data through a socket by 'listening' to the socket. A socket can only have one listener at a time. 
+
+An OS will reserve certain sockets, and many are used for particular protocols or processes by convention. Sockets
+are given often with the IP address, for example 127.0.0.1/80 for port 80, or you'll see it as 127.0.0.1:80
+
+Common socket identifiers with associated protocols are:
+	21		FTP
+	22		SSH
+	23		Telnet
+	25		SMTP
+	53		DNS
+	80		HTTP
+	110		POP3
+	119		NNTP
+	123		NTP
+	143		IMAP
+	161		SNMP
+	194		IRC
+	443		HTTPS
+
+System ports range from 0 to 1023, and registered ports (up for grabs from processes) range from 1024 to 49151,
+with the remained used for dynamic or private ports.
+
+Let's get some hands-on experience with these concepts. 
+The ip address command will show you your IP address
+	$ ip address
+The hwinfo command lists hardware on the computer, including wireless interface information
+	$ hwinfo
+	$ hwinfo --netcard --network
+Adding the netcard and network tags searches for networking hardware and prints all sorts of useful information
+such as MAC (hardware, HW) addresses.	
+The iw commands can show you loads of information on your wireless hardware. For example
+	$ iw wlp8s0 info		Get information on a device (wlp8s0)
+	$ iw phy				Dump information on available hardware
+	$ iw list				Same as phy
+	$ iw dev				List available wireless devices
+The netstat command can be used to list the ports in use
+on a system. It's part of the net-tools package if it isn't installed yet. 
+	$ netstat
+	... (A bunch of processes and port numbers) ...
+
+
+==== ROUTING ====
+Routing is the process of sending packets from one host to another. Recall that a host is any node in a network,
+such as a computer, or router, or anything else. Routes are determined using a particular algorithm which uses
+information of the available devices and the devices their connected to and so on. The best path is often the
+shortest path, but traffic through nodes is also an important determining factor.
+
+Dynamic routing is when a route is found by constructing tables of available nodes called a routing table, for
+each host in the network. This makes the process of selecting a route for a packet to follow a bit faster. Notable
+routing protocols include Routing Information Protocol (RIP), Open Shortest Path First (OSPF), and Enhanced
+Interior Gateway Routing Protocol (EIGRP, available only to Cisco routers).
+
+Data can be routed from one node to another (unicast), from one point to every other point in the network
+(broadcast), from one point to several points in the network (multicast), from one point to any other point
+(anycast), or internationally (geocast). Unicast is very common e.g. for a user communicating with a server, but
+both multicast and broadcast have important roles in communication.
+
+Every host in a dynamic network keeps a routing table. On a local network, such as the computers connected to
+your router, all packets have to go through the gateway. This was mentioned earlier. The router is the gateway
+on a WLAN, so the routing table in a local network will always contain the gateway (the router) as well as other
+devices that can route traffic on the network. The router has a much larger routing table, so it can get your
+messages to where they need to go. 
+
+View your computers routing table with:
+	$ route			
+	$ route -n		Use numeric addresses instead of host names
+
+==== DATA PACKETS ====
+

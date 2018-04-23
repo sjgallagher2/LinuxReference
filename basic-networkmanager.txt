@@ -1,0 +1,13 @@
+The NetworkManager is an application for managing connection to local networks. It is responsible for accessing
+Wi-Fi networks and the like, and it has some helpful tools for managing your networking on you computer. The
+command line interface for NetworkManager is nmcli (Network Manager Command Line Interface), and there are many
+arguments you can pass for different functionality. The basics:
+	nmcli general		Show NetworkManager status and permissions
+	nmcli networking	Query NetworkManager networking status, enable and disable networking
+	nmcli radio			Show radio switches status, or enable and disable the switches
+	nmcli connection	Handle network configurations (connection files)
+	nmcli device		Show and manage network interfaces
+	nmcli agent			Run nmcli as a NetworkManager secret agent, or polkit agent
+	nmcli monitor		Observe NetworkManager activity
+
+
