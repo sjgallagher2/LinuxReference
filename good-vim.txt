@@ -1,0 +1,315 @@
+How do you work =well= in vim? How can vim replace your notepad++ (or notepadqq) and IDEs? How can you manage 
+a good workflow in vim? Let's get into it. 
+
+==BASICS==
+First of all, the basics. Open a file by using
+	$ vim somefile.txt
+And you start in normal mode. "Insert" mode is accessed by pressing "i" which is the typical editor-style mode. 
+You can go into "Insert" mode at the end (appending) with "a" for append. The arrow keys work as usual, in
+both modes. In Normal mode you can use a bunch of keys to do things like deleting lines, copying and pasting,
+and so on. There's a real skill to being able to use vim quickly and easily, it doesn't come naturally. 
+
+Saving is done by ":w" and quitting by ":q". Quit without saving is done by ":q!" and save and quit with ":wq".
+These commands are given in Normal mode, and you can get out of Insert mode by pressing ESC. Note that the colon
+":" is the escape key for Vim. 
+
+Opening multiple files is done by listing them as arguments. Then you can see where you are in the files with
+:args and you can switch between files with :next or :n. Commands in vim can be shortened as long as no other 
+command starts with the same letter. For example, :w and :q are short for :write and :quit respectively. You
+can go to the previous file with :previous or :prev or :N (which is short for :Next meaning the previous instead
+of :next which is the next file). You can open files while vim is open with :argadd file.txt which adds file 
+arguments to the command i.e. adds more files. 
+
+While standard multiple file editing is done with those commands you can also edit with tabs. This is done at
+first by using
+	$ vim -p file1.txt file2.txt ...
+And files can be opened from vim with :tabe filename.txt. Moving between tabs is done with :tabn for next tab and
+:tabp for previous tab. In normal mode you can switch between tabs with gT and gt. 
+
+The window can be split with :sp for horizontal split or :vsp for vertical split. You can tell vim to split into
+N windows with
+	$ vim -oN files.txt ... 	Where N could be 2, 3, 4... for horizontal split
+Or
+	$ vim -ON files.txt ...		For vertical split
+You can leave the number of splits out if you want every file to have its own section in the split.
+
+Viewing differences between files is done by calling vim with
+	$ vim -d files.txt ...
+Or with
+	$ vimdiff files.txt ...
+
+SUMMARY
+	////////////////////////
+	=Starting file1, file2, etc=
+	////////////////////////
+	$ vim file1			Open file
+	$ vim file1 file2		Open files
+	$ vim -p file1 file2		Open files in tabs
+	$ vim -o file1 file2		Open files in horizontal split view
+	$ vim -O file1 file2		Open files in vertical split view
+	$ vim -o2 file1 file2 file3	Open files in two split windows
+	$ vim -d file1 file2		| View differences (worth looking into diff command in unix)
+	$ vimdiff file1 file2		|
+	
+	////////////////////////
+	=Working with Files=
+	////////////////////////	
+	:w				Save (write)
+	:q				Quit, close tab
+	:wq				Save and quit
+	:q!				Quit without saving
+	i				Insert mode (from Normal)
+	a				Append mode (from Normal)
+	ESC				Return to Normal mode
+	
+	:args				List files with brackets around current file
+	:argadd file2			Add a new file/argument
+	:next, :n			Move to next file/argument
+	:Next, :previous, :prev, :N	Move to previous file/argument
+	
+	:e file2			Edit file2, add it as a buffer
+	:buffers, :ls			|Lists the buffers (files) available to edit
+	:badd file2			Add a new buffer
+	:bd				Buffer delete, closes a file
+	:bn				Move to the next buffer
+	:bp				Move to the previous buffer
+	
+	:e CTRL+d, :w, :argadd, etc	Shows the working directory when typing a command
+	  Backspace or CTRL+^ to get back or type a file to edit
+	:[CTRL+d]			List all possible commands
+
+	//////////////////////////
+	=Splits and Tabs=
+	/////////////////////////
+	:sp				Horizontally split the window
+	:vsp				Vertically split the window
+	:on				Make this window the ONly window
+	CTRL+w [arrow key]		Change to split window
+	CTRL+w =			Equalize split size
+	CTRL+w r			Swap splits
+	CTRL+w T			Break current window into tabview (that's a shift T)
+
+	:tabe file2			Open file2 as a new tab
+	:tab sball			Turn all buffers into tabs
+	:tabm N, :tabmove N		Move current tab to Nth position
+	gt				Move to next tab
+	gT				Move to previous tab
+	:tabn				Next tab
+	:tabp				Previous tab
+	CTRL+pg dn			Next tab
+	CTRL+pg up			Previous tab
+
+== EDITING TEXT ==
+There are many ways to edit text in vim. There are many options for doing similar things, and
+many abbreviations and such. But there are of course "themes" to look out for. 
+
+Navigating is done with the arrow keys, though this isn't really the "vim" way of doing things. 
+Instead you cross characters, words, or lines. You can go forwards, backwards, to the start of
+a line or end of a line, start of a word or end of a word, cross several words, move to the next
+appearance of a certain character, and so on. 
+
+The same navigating techniques are used for deleting text, replacing text, copying text, etc. This
+is done by typing a number followed by a command, or typing a command followed by a navigation
+command. 
+
+Instead of talking about all of the options, I'll list them as a summary. These apply to NORMAL mode.
+	w	Next word (counts whitespace, punctuation, etc as words)
+	e	End of current word
+	b	Go back a word
+	bg	Go back to the beginning of the previous word
+	we	Go to the end of the next word
+	Nw	(N = 1, 2, 3...) move N words. This applies to other nav commands as well, and is called the "count".
+	W	Next word (skip whitespace and punctuation)
+	E	End of current word (skip whitespace and punctuation)
+	B	Go back a word (skip whitepsace and punctuation)
+
+	$	Go to end of line
+	N$	(N = 1, 2...) Move to the end of the Nth line ahead
+	k	Go up a line				|
+	j	Jump down a line			|
+	l	Move to the right one character		| NOTE: These make up a keypad of their own
+	h	Move to the left one character		|
+	^	First non-blank character of a line	
+	0	Very first character of a line
+	gg	Go to the first line of the file
+	NG	(N = 1, 2...) go to line number N
+	G	Go to last line of the file
+	H	Go to "home" position at the top of the visible page
+	M	Go to the "middle" position of the visible page
+	L	Go to the "last" position of the visible page
+	
+	fx	Find/goto next appearance of character "x" 
+	Fx	Find goto previous appearance of "x"
+	tx	Go "to" next appearance of "x", stops before "x"
+	Tx	Reverse go "to"
+	;	Repeat the last "find" command
+	,	Repeat the last "find" command in the opposite direction
+NOTE: Find commands only apply to the current line!
+	
+	/word	Search for "word" forwards
+	?word	Search for "word" backwards in the doc
+	n	Go to the next appearance of the searched word
+	N	Go to the previous appearance of the searched word
+	%	Move to matching parenthese (works for multiple lines)
+	N%	(N = 0 - 100) Move to the line N percent through the filea
+	zz	Put the cursor in the middle of the screen (moves the screen not the cursor)
+	zt	Put the cursor at the top of the screen
+	zb	Put the cursor at the bottom of the screen
+	Ctrl+d	Move a half page down
+	Ctrl+u	Move a half page up
+	Ctrl+b	Page down
+	Ctrl+f	Page up
+	Ctrl+y	Move view pane up
+	Ctrl+e	Move view pane down
+
+You can delete text with the "d" command, and you can delete entire lines with "dd". You can delete several lines
+by giving "dd" a count, like 3dd. Any mistakes can be undone with "u" or redone with CTRL+r. Characters are deleted
+with "x" and you can add a count to that as well. Anything you deleted is "cut" i.e. it is saved and you can "put"
+or "paste" with "p". For example, moving 3 lines around is done by 3dd (move somewhere else) p which will put the
+lines on the next line after the cursor. For characters or words deleted, it will insert after the cursor. 
+
+The "d" command can be modified with navigation techniques to delete up to a certain point. Copying is called
+"yanking" and is done in a few ways.
+	v	Start a selection on a character-basis
+	V	Start a selection by line
+	y	Yank selected text
+	yy	Yank the current link
+	ym	(m = navigation commands) Yank according to navigation commands
+	p	Put, paste after the cursor
+	P	Put before the cursor
+	gp, gP	Put and put cursor at the end of the put text
+
+Assuming you have everything so far pretty good, we can edit even better with the following commands. 
+	{		Jump to next paragraph
+	}		Jump to previous paragraph
+	r		Replace ("r") a single character
+	J		Join ("J") line below with current line, adding a space in between
+	gJ		Join line below with current line, no added space
+	cc		Change entire line
+	cm		(m = nav commands) Change to the navigated point e.g. the end of a word (w) or line ($)
+	s		Delete character and go into Insert mode
+	.		Repeat last command
+
+One of the most useful modes is Visual Block mode (ctrl + v) which lets you take actual squares of selection. This
+is ideal for working with repetitive changes. To insert in Visual Block mode, use shift i (I) and type, then when
+you escape, all text will be inserted. Another great tool for editing blocks of text is the shift-text
+in visual mode, done with carats < (decrease indent) and > (increase indent). 
+	Ctrl + v	Visual Block mode
+	I			Insert text when in Visual Block mode
+	>			Indent in Visual mode
+	<			De-indent in Visual mode
+
+To duplicate a line (another really common and helpful tool) you can yank the line (yy) then put (p):
+	yyp		Duplicate line
+If this is inconvenient, you can map something like Ctrl+d to execute this. 
+
+== STYLE AND APPEARANCE ==
+Vim is quite customizable, and many developers love to give their workspace that unique, specialized feeling. Let's
+get into some of the nice features vim has available. 
+
+You can change settings when vim starts up by changing the .vimrc file. This runs commands ( : commands) whenever
+vim starts up like .bashrc for terminal. You can try things out, and then when you know what you like, put the
+commands into your .vimrc file and your vim will always set up properly. 
+
+Note for these options, you can type the start of the option followed by SPACE and CTRL+d to get a list of available
+values. This is really helpful for things like colors, syntaxes and languages, etc. Current values for :set options
+can be viewed by adding a question mark for the option, like :set number?.
+
+Options (abbreviations in parens)
+	:set				View all options that have changed from their default values
+	:set CTRL+d			View all options available
+	
+	UI
+	:set number			Show line numbers
+	:set ruler			Show a bar on the bottom right indicating where in the file you are
+	:set showcmd			Show the last command entered in the bottom right
+	:set cursorline			Highlight the line the cursor is on
+	:filetype indent on/off		Turns on filetype detection, uses a file in .vim/indent/language.vim for 
+					settings
+	:set wildmenu			Show autocomplete options 
+	:set showmatch			Highlight matching brackets and parens
+
+	SPACING
+	:set autoindent (ai)		Maintain indents from previous line
+	:set tabstop=N			Set the number of spaces a tab counts as when OPENING a file
+	:set shiftwidth=N		Set the tab size
+	:set expandtab			Turn all tabs into spaces
+	:set colorcolumn=N		Highlight column N to avoid going too far to the right
+	:set smartindent		Uses "smart" indenting for better indents
+	:set cindent			Use C rules for indenting
+	
+	COLOR
+	:set background (bg) dark/light	Set the background to dark or light
+	:colorscheme myscheme		Set the colorscheme. For a list, use :colorscheme CTRL+d
+	NOTE: Color schemes are located in .vim/colors/ and you can easily add themes. Search around for a good theme.
+	
+	TEXT FONT
+	:set guifont=Font		Set the vim gui's default font to Font
+
+	SYNTAX
+	:syntax 			Change syntax processing (enable, reset, manual, etc)
+	
+	SEARCH
+	:set incsearch			Search continuously as a search phrase is entered (like /words)
+	:set hlsearch			Highlight all appearances of searched term
+	NOTE: For highlighting vim will keep highlighting until you search something else or tell it to stop
+	with :nohlsearch
+
+	FOLDING (Folding nested code and bracketed text)
+	:set foldenable			Enable folding
+	:set foldlevelstart=N		Set the initial fold level (how deeply nested something is to get folded)
+	:set foldnestmax=N		Sets a max number of nested folds to avoid getting carried away
+	NOTE: The "za" command will open or close folds
+	:set foldmethod=syntax			Set a method for folding e.g. indent, syntax, manual
+
+One of the more important aspects of using vim is that you can replace key mappings to better suit your needs
+and preferences. You'll start figuring out over time that maybe $ is not a very easy key to hit to go to the 
+end of a line. That's okay, you don't have to take it out on vim, you can just change it to something you like
+better. The business of key mappings can be a bit involved, so I suggest you look into it through Google. 
+
+== PLUGINS ==
+There are many plugins available which add important functionality to vim that people should be aware of. For
+example, graphics to make thins look good, plugins for commenting large selections automatically, and so on. 
+One problem is that you have to manage plugins manually, but programs like pathogen automatically take
+plugins from a folder and load them into vim when it starts which is great. 
+
+Great plugins:
+	NerdCommenter	Comment large blocks of text
+	NerdTree	Add a tree explorer (functionality can be poor with split screens)
+	Lightline	A status bar in the bottom of the screen
+	Airline		Another status bar plugin
+	Command-T	Quick "fuzzy search" for opening files
+	Supertab	TAB autocomplete
+	Fugitive	A git wrapper
+	Git Gutter	Adds a bar on the left with changes information, diff style
+
+== BEST PRACTICE ==
+Vim expects a certain workflow in order to work well. One of the biggest draws to vim is that everything is done
+through your keyboard. That also means you have to master a whole bunch of key commands and keystrokes. After
+you get through this, you tend to look for ways to make vim more familiar e.g. by setting up your .vimrc and 
+installing some plugins. One of the biggest obstacles, however, is the fact that vim uses buffers instead of more
+GUI-friendly tab pages. 
+
+Now vim supports tabs, but they are not the same as a tab you would have in a GUI text editor. Rather, they are a
+way of organizing your workspace. Buffers represent different files that you can work on in vim, tabs do not.
+Tabs represent workspaces, with the intention that you will work on different projects or different tasks across
+multiple buffers in different tabs, with each tab responsible for several buffers. 
+
+Buffers can seem like a pain to work with at first, but they really are helpful. The most helpful commands for
+working with buffers are :ls (list buffers), :b <filename> (open buffer <filename>), :e <filename>, :sb <filename>
+(split buffer into view, horizontal split). There's no command vsb for a vertical split buffer, but you can
+technically pipe a :vsplit with a :b command. Finally, you can delete a buffer with :bd. When you have things
+split up in a fairly intricate way, it may be wise to delete the buffer from another, :bd <filename>. The best
+way to exit out of vim without messing with the state of splits or buffer arrangements is with :qa (quit all). 
+
+Using -marks- can improve your productivity when working in vim. A mark can be set in one buffer and opened in
+any other, so you can quickly move between positions in a file or between two buffers. A mark is assigned a name
+(a-zA-Z) and is opened with either a backtick ` (go to character mark was set at) or a single quote ' (go to
+beginning of line mark was set at), e.g. `a would go to the character mark a was set at. Setting marks is done
+with m{a-zA-Z} in normal mode. You can list marks with :marks, and you can delete marks with :delm. 
+
+Lowercase marks (a-z) apply to the current buffer only. Uppercase marks (A-Z) are global to vim, and will remain
+in your .viminfo even after you leave vim. This way you can quickly open files that are commonly used such as the
+.vimrc file. 
+
+
