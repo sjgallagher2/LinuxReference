@@ -1,14 +1,14 @@
 Version control, i.e. keeping track of how software changes over time, is an important aspect of software. In
-fact, version control has gone beyond "helpful" and into "mandatory" territory. Git is perhaps the most common
+fact, version control has gone beyond "helpful" into "mandatory" territory. Git is perhaps the most common
 version control tool, with other options including subversion (SVN), mercurial, and more. Let's stick with git. 
 
 At its core, git is software which manages several versions of files and projects, allowing you to return to a
 previous state, or "tag" the software at a point with a version number, and even release the software as a tar
 ball. Websites such as Github and Bitbucket allow you to manage a remote repository, forking other peoples repos
-and managing your own from online or locally.
+and managing your own from online or locally. 
 
 All that being said, let's look at good git practices. After all, it's not every day you have to work with
-software that has the ability to "undo" months or years of work if used (very) uncorrectly. 
+software that has the ability to "undo" months or years of work if used (very) incorrectly. 
 
 Git is used to do the following core operations:
 	Create a new repo, or clone a repo from a remote source
@@ -19,6 +19,51 @@ Git is used to do the following core operations:
 	Make a new branch and visit other branches of the repo
 	Merge branches, tags, or remote repositories with the local repo
 	Release software as a tar ball
+
+One git notation is worth pointing out:
+	--		A double-dash separates the commands/branches/etc from filenames. This is
+			necessary for when you have e.g. a file called master, where 
+				$ git checkout master
+			Will checkout the master branch, but 
+				$ git checkout -- master
+			Will check out the file called master.
+
+
+The following commands are commonly used in git:
+	git init 			git remote
+	git push 			git pull
+	git clone 			git add
+	git commit 			git branch
+	git checkout 		git reset
+	git revert 			git diff
+	git status 			git log
+	git tag 			git merge
+	git ls-tree 		git mv
+	git rm 				git clean
+
+=========================
+===== GIT COMMANDS ======
+=========================
+Understanding git really means understanding its commands and syntax. There are 20 commands listed above, and we're
+going to cover each one. In total, there are about 160 commands, including variations on the above (e.g. merge,
+merge-base, merge-file, merge-index, etc...) and some less common commands (I've never used cherry or bisect or
+quiltimport, for example) as well as web-related and gui-related commands (for Windows Git). 
+
+git init		Creates a new .git folder and initializes the current directory as a git repo. Safe to run in
+				existing repos.
+git remote		Git remote helps manage different tracked remote repositories. A tracked repo is one where you
+				can push or pull to/from it, across https or ssh. You can add, rename, remove, set-head,
+				set-branches, get-url, set-url, show, prune, and update. With no arguments, it lists existing
+				remotes. 
+git clone		Clone a repository to a directory
+git add			Stage files that have been modified. Must be done before committing. 
+git commit		Commit changes to git
+git branch		Manage branches
+git checkout	Update files in working tree to match specified version/index/tree
+git status		Show status of working tree relative to previous commits
+git log			Show log of commits
+git reset		Reset current HEAD to specified state
+git revert		Undo previous commits with new commits undoing the changes
 
 =========================
 ==== GETTING STARTED ====
@@ -66,21 +111,51 @@ For all local changes. You could similarly use
 For all files in the local directory (not sure about subdirectories). Do this before you commit, especially when
 you've created new files. Having staged and unstaged changes is a powerful tool for git, because it allows you
 to, say, revert to a previous commit, with all activity after that being unstaged changes that you can erase. 
-To discard all you local staged and unstaged changes i.e. to revert to the last commit, use
+
+To get to some point in your history, you can use git checkout, git reset, or git revert. These are all used
+differently: git reset will move HEAD to a previous point, and you have the choice of whether or not to
+keep the working tree as-is or to overwrite everything; git revert always allows you to go back to
+previous commits, because it simply adds new commits that undo them; git checkout is more generally used
+to update the files in your working tree to match a previous state, and to move HEAD around (and possibly
+detach it). 
+
+If you want to discard local changes for a particular file to the way they
+were before you committed, you can checkout that file (see below). 
+	$ git checkout -- <filename>
+These changes are gone, no going back. To discard all you local staged and unstaged changes i.e. to revert to the 
+last commit, use
 	$ git reset --hard HEAD 
-Note: The HEAD is an important aspect of git, which we'll get to later. You can do this for only a particular
-file as well:
+Note: The HEAD is an important aspect of git, which we'll get to later. 
+You can do this for only a particular file as well:
 	$ git reset --hard HEAD filename.txt
-And going all in, you can revert to a previous commit (by producing a new commit which changes everything back)
-using
+
+Git reset generally will undo changes, but keeps the files as they are on your computer, so the commits are 
+undone but nothing else changes. By specifying --hard, git reset will undo the commits and revert all the files 
+to their state in the specified commit. It changes HEAD but does not change the index (staging area, see below). 
+Git reset without --hard is essentially the opposite of git add. 
+
+Git-checkout in general changes the current working tree to match a previous state. 
+	$ git checkout HEAD		Change working tree to match previous commit
+	$ git checkout -- .		Change working tree to match index (undo unstaged changes only)
+Because it changes the working tree, these changes are final. 
+
+For transparency, you can revert to a previous commit (by producing a new commit which changes everything 
+back) using
 	$ git revert mycommit
 And this way no work is lost if you decide you didn't want to totally revert all the changes. 
+One final way of getting back to the latest commit is with 
+	$ git stash
+This is reset your working tree to the most recent commit, but it will stash away local changes so they're not
+gone forever, and it does it in a clean way (no other commits or unstaged changes when it's done).
+
+
+See more information on moving between commits and branches below. 
 
 If a file was tracked, you can use git diff, as I mentioned before, to see how it has changed since the last 
 commit. 
 	$ git diff filename.txt
-More generally, you can look at the -status- of the working directory, which means the status of all files that
-have changed in your directory. 
+More generally, you can look at the -status- of e.g. a commit, which shows everything that changed in that
+commit. This shows all the changes in the most recent commit:
 	$ git status
 You can also look at the staged changes in the repository with git diff:
 	$ git diff --staged
@@ -90,6 +165,10 @@ Which should include a message, usually:
 	$ git commit -m "Brief commit summary..."
 Quotes included. You can commit all local changes to all tracked files using
 	$ git commit -a
+To view the changes after a commit, you can use git show. It defaults to HEAD (see below), the most recent commit
+on the current branch. 
+	$ git show
+More on git diff and git show later. 
 
 It is very good practice to commit often. But do not commit unfinished code, that's bad practice. Commit every
 chance you have a logical "break point" where some part of the code is written. If you make a mistake with the 
@@ -116,17 +195,15 @@ A project isn't all about adding files and changes however, sometimes you need t
 unstaged or even the staged changes. Maybe you only care about the files that are being tracked, and you want
 to delete the ones left over. 
 
-If you want to roll back all the unstaged changes, you would checkout the recent commit (wherever you are) with
-	$ git checkout -- .
-Note that the "--" is used to clear up ambiguities in the commands. For example, if you for some reason had a
-file named "-f", you couldn't do much to it with git. So you would have to separate it with the double dash.
-Similarly, you can clean the changes made so far with git clean. You can review the cleaning with:
-	$ git clean -nd
-And you can completely clean out any unstaged and staged changes with
-	$ git clean --hard
-Then you can remove files and directories that are not currently tracked with
-	$ git clean -fd
-But this specifically means removal from your local directory. 
+You can remove unfollowed files in the tree with git clean. You can review the cleaning with:
+	$ git clean -n
+Where the -n option means dry-run. Then you remove by force:
+	$ git clean -f
+You can remove files and directories:
+	$ git clean -f -d
+And you can remove unfollowed files as well as files in your .gitignore with -x:
+	$ git clean -f -x
+There is also an interactive mode to interactively clean out untracked files. 
 
 When you delete a file, a copy of it will still be expected by git, and the old version will be kept when it
 isn't staged. So you need to stage its remove with:
@@ -143,9 +220,9 @@ Which will list the files tracked for HEAD, and
 	$ git ls-tree -r master --name-only
 Specifically to see files tracked for master. 
 
-===========================
-==== BRANCHES AND TAGS ====
-===========================
+===============================
+====== BRANCHES AND TAGS ======
+===============================
 Branches and tags make the git go round. The master branch is your "official" branch in your repo, the one which
 has up to date, preferably working code. You can make new branches, each with its own commits and everything,
 and jump around to different branches, merging things together. Each branch should be used to implement a new
@@ -164,11 +241,37 @@ Better yet, you can create a new branch and check it out with
 And when you're done with a branch, you can delete it with:
 	$ git branch -d branchname
 
-Merging two branches together is one of the most important parts of using git. Before we get into that, however,
-I'd like to take a second and talk about HEAD. HEAD is a pointer to the most recent commit in a repository. 
-Typically, that means the most recent commit to the working branch. The most recent commit in any branch in your
-repo is called the -tip- of the branch, so the HEAD often points to the tip of the branch you're working in. If
-you want to get to the most "official" version of your project, the HEAD should point to the tip of master. 
+A commit is typically referred to by its SHA value, like 689b35adbfc88b2bb2f55f52cbf3dcb48102a513. This is
+automatically generated. It isn't very useful to refer to commits like this, especially when versioning is
+involved, so instead we tag commits with a symbolic name.
+	$ git tag v1.2			Create a tag for this commit called v1.2
+	$ git tag -l			List tags
+	$ git tag -d v1.2		Delete tag v1.2
+	$ git tag v1.3 689b35adbfc88b2bb2f55f52cbf3dcb48102a513			Tag commit 689b... with v1.3
+
+Tags don't have to just be names either. They can have annotations, in which case they are called tag objects.
+Tag objects can be unsigned or signed with a user key. 
+
+The git HEAD is a very useful concept. HEAD is a pointer to the current branch, at the most recent commit. When
+you git checkout, you really just move HEAD. Wherever HEAD is, your local directory will reflect that branch. If
+you move HEAD to a specific commit in a branch, it is called detached. Note that the most recent commit in a
+branch is often called the "tip", although this isn't a command or argument. An example:
+
+	$ git checkout branchname		Set HEAD to the tip of branchname
+	$ git checkout master			Set HEAD to the tip of master
+	$ git checkout tagname			Detach HEAD, point to the commit tagged "tagname"
+	$ git commit -a					From the detached HEAD, make a new commit. This is "in parallel" to other
+									commits, it doesn't overwrite anything. These commits will be deleted by git 
+									if not referenced
+	$ git branch newbranch			From detached HEAD, make a branch from the detached commits, saves detached
+									commits from deletion, because newbranch references them
+	$ git checkout newbranch		From anywhere, HEAD is no longer detached, and points to the tip of
+									newbranch
+	$ git checkout master			Go back home to the tip of master
+
+While HEAD points to the most recent commit of a branch, you can access the commit before that with HEAD^, and
+the commit before that with HEAD^^, and so on. This is useful for diffs. 
+
 
 When you've made changes to a branch relative to the master branch, you'll probably want to merge those changes
 into master. To do that, it's good practice to first merge master into the branch, then merge the branch into
@@ -181,6 +284,196 @@ Then resolve any issues and try merging again. Then from master:
 	$ git merge branchname
 Which shouldn't have any issues. 
 
+It's best practice not to have any uncommitted changes when merging. If you try to merge and it comes up with
+conflicts, use
+	$ git merge --abort
+This will reconstruct the pre-merge state of things. You can also use
+	$ git merge --continue
+To force your way through the merge, conflicts-be-damned. 
+
+There's a -lot- to be said about merging, because obviously the idea of merges and conflicts and unfinished
+states is worrisome when irreplaceable work is concerned. Read the man page for git merge, it has a great amount
+of information on the topic of merging and best practices. 
+
+=========================================
+==== GIT TREES AND HEADS AND INDICES ====
+=========================================
+Above we introduced the HEAD pointer. We mentioned things like the working tree and the index. Let's clear things
+up with all these different and seemingly similar concepts. 
+	Directories
+		Working tree (previously called the working directory)
+		Git directory/repository
+	Branches
+		Master
+		HEAD - Local HEAD, remote HEAD, detached HEAD
+		Origin
+	Data items
+		Index (often called the staging area, or cache)
+		Tree
+		Blob
+		Snapshot
+A file can be changed, staged, or committed. The working tree is where you work (with your changed files, staged
+or unstaged, committed or not). It is your files as-they-are, while you're working. The index is the
+file-representation of the staging area. When you stage files, you are "adding them to the index". The git
+repository stores the entirety of your project history. 
+
+The index, staging area, stage, and cache are all the same thing. 
+
+The master branch is the main branch of your project, the HEAD is a pointer to the tip of a branch (see above) 
+where you're working, the origin is the remote repository. Origin is the default name given to a remote repository 
+you push to and pull from. 
+
+Data is stored in compressed files called blobs. A blob is associated with a particular file, a tree is associated 
+with a particular directory of files. A commit is saved as a "snapshot" of your project. The index saves a 
+snapshot of your working directory for staged changes, then this is saved during a commit. Snapshot is a common
+term, not necessarily a formal one. 
 
 
+=============================
+========= GIT DIFF ==========
+=============================
+Understanding the output of a diff command in Unix (and here, specifically, git) is endlessly useful. There are 
+three ways of running a diff. The first is the plain, computer-language one:
+	$ diff file1.txt file2.txt
+The more useful ways are context mode and unified mode. 
+	$ diff -c file1.txt file2.txt		Context mode
+	$ diff -u file1.txt file2.txt		Unified mode		<- Default git mode, git diff assumes unified mode
 
+It would help to have some example files to use to distinguish these types of outputs. Consider files text1.txt 
+and text2.txt. Line numbers are added (they aren't in the actual text files).
+
+<file text1.txt>
+1		line1
+2		line2
+3		line3
+</file>
+
+<file text2.txt>
+1		line2
+2		line3
+3		newline
+</file>
+
+Diff generally tells you what files you're looking at (assume an original and a revision), how long they are, and 
+where changes occur. To tell you where changes occur, it shows the 'context', starting at some line and showing a 
+number of lines following. The starting line and number of lines are listed.
+
+Without further ado, here are the types of diff (for Windows in Cmder). Plain:
+	$ diff [--color] text1.txt text2.txt 
+	
+1d0
+< line1
+3a3
+> newline
+
+Here, the output is a bit ugly. Each line change is listed individually (instead of showing context). 1d0 means
+the first file's line 1 is deleted (d) and would have appeared at the second file's line 0. For several lines, a
+comma separated range is given, like 15,20 (lines 15 to 20). Lines can be added (a), deleted (d), or changed (c). 
+We also have context mode, which shows some more lines (default 3) above and below the common lines:
+	$ diff -c [--color] text1.txt text2.txt
+	
+*** text1.txt   Mon Mar 11 14:14:15 2019
+--- text2.txt   Mon Mar 11 14:14:15 2019
+***************
+*** 1,3 ****
+- line1
+  line2
+  line3
+--- 1,3 ----
+  line2
+  line3
++ newline
+
+Here, the files are listed, with time stamps. The first (original) file is indicated with "***" and the second
+(new) file is indicated with "---". The 1,3 is the range for the changes/context: starting at line 1, ending at
+line 3. A "-" in the context sequence means line is deleted, a "+" means added, "!" means a change.  In unified 
+mode, the two files are combined into their longest common sequence, to give a "unified" appearance:
+	$ diff -u [--color] text1.txt text2.txt
+	
+--- text1.txt   2019-03-11 14:14:15.778858300 -0400
++++ text2.txt   2019-03-11 14:14:15.262058300 -0400
+@@ -1,3 +1,3 @@
+-line1
+ line2
+ line3
++newline
+
+This starts with a header, describing the files being looked at. --- means first/original file, +++ means 
+second/revised file. The time stamps are included for each. After the header, we have a context, which makes up 
+the rest of the output. The context starts with @@ -1,3 +1,3 @@, which is in the format @@ -<line start A>,<number 
+of lines A> +<line start B>,<number of lines B>. These describe the context start line (1 in both cases) and the 
+number of lines shown (3 in both cases). As above, the minus (-) sign is not a negative, it just means the first
+file, and the plus means the second. An example, @@ -35,12 +31,11 @@ means the first file starts at line 35 and 
+is 12 lines long, and the second starts at line 31 and is 11 lines long. 
+
+The file itself has a "-" for text that was deleted (text only in the first file), and a "+" for text that was 
+added (text only in the second).  Note how it picks up on the fact that both have line2 and line3, and used those 
+to align the files. This is called alignment. The output is a combined version of the two files.
+
+For git-diff, which is essentially unified mode with git-particulars included:
+	$ git diff text1.txt text2.txt
+	
+diff --git a/text1.txt b/text2.txt
+index 83db48f..8491237 100644
+--- a/text1.txt
++++ b/text2.txt
+@@ -1,3 +1,3 @@
+-line1
+ line2
+ line3
++newline
+
+We see that this is unified mode, it just runs the diff command with the --git flag to show the commit
+information. 
+
+About alignment - Diff is based on the longest common subsequence problem. Given the two files, it finds the
+longest string of common characters/lines common to both files. Changes (insertions or deletions) are listed in
+between common elements. The best source of information and examples for the diff utility is Wikipedia, because 
+the man page only lists options, and the info page is slightly better but still assumes a lot of prior knowledge. 
+
+Viewing changes between commits, branches, staged changes, etc is always useful. For this purpose, one can use:
+	git diff		Difference between files
+	git status		Staged changes since last commit
+	git show		Shows last commit with its associated changes (by default)
+Git show defaults to a git-log type behavior, but instead of only showing commit information (who made the
+commit, when, the SHA, etc) like git log, git show also displays all the changes made for that commit. 
+
+These commands can work in many different ways, and the man pages are the proper reference. Git diff will
+typically compare your working tree to whatever you specify. You specify a commit with its tag or its SHA-1 name,
+either the full name or only enough characters to be unique. For example, 
+476d264fd7fff4394c63c5af42e2e76496fcf6d0 and 476d264 are both valid, as long as no other SHA-1 starts with
+476d264. 
+
+Some examples are in order, though they are not substitutes for the man pages. 
+	$ git diff				Difference between working tree and index (shows unstaged changes)
+	$ git diff --cached		Difference between index and previous commit
+	$ git diff --staged		Same as --cached
+	$ git diff HEAD			Difference between working tree and last commit (shows all changes, staged and
+							unstaged)
+	$ git diff otherbranch	Difference between working tree and tip of otherbranch
+	$ git diff HEAD -- afile	Difference between afile in working tree and in previous commit
+	$ git diff HEAD^ HEAD	Difference between second latest commit and latest commit
+	$ git diff master otherbranch	Difference between tip of master and otherbranch
+	$ git diff master..otherbranch	Same as above
+	$ git diff master...otherbranch	Changes in master since otherbranch was branched from it
+
+Friendlier outputs/summaries:
+	$ git diff --stat		Create a histogram showing insertions, deletions
+	$ git diff --name-status	Only show names and changes, not diff output
+
+This last option, --name-status, will list the files, with letters according to the following list:
+	A	addition
+	C	copy (followed by a percentage of similarity between original and renamed versions)
+	D	deletion
+	M	modification
+	R	renaming (followed by a percentage of similarity between original and renamed versions)
+	T	change type
+	U	unmerged (need to finish the merge)
+	X	unknown (likely a bug)
+
+Note that git-show will perform a diff as well as showing commit information. It shows the changes that occurred
+during the specified commit. 
+
+In addition to basic git diffs, there are "raw output" diffs, including git-diff-index, git-diff-tree, and
+git-diff-files. These show raw (computer-friendly), and provide a speed boost, but otherwise aren't too different
+from standard git-diff. 
