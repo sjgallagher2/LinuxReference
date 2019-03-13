@@ -148,8 +148,7 @@ One final way of getting back to the latest commit is with
 This is reset your working tree to the most recent commit, but it will stash away local changes so they're not
 gone forever, and it does it in a clean way (no other commits or unstaged changes when it's done).
 
-
-See more information on moving between commits and branches below. 
+See more information on moving between commits and branches below, and below that for more on undoing. 
 
 If a file was tracked, you can use git diff, as I mentioned before, to see how it has changed since the last 
 commit. 
@@ -189,7 +188,7 @@ Or to see the entire history of the file,
 Note the two dashes in between the p flag and the filename. You can see who changed what and when (particularly 
 helpful when working in teams) using git blame.
 	$ git blame filename.txt
-It might seem harsh, but blaming is an essential part of working in teams. 
+Despite the harsh-sounding name, blaming is an essential part of working in teams. 
 
 A project isn't all about adding files and changes however, sometimes you need to delete a file or clear the
 unstaged or even the staged changes. Maybe you only care about the files that are being tracked, and you want
@@ -457,6 +456,11 @@ Some examples are in order, though they are not substitutes for the man pages.
 	$ git diff master..otherbranch	Same as above
 	$ git diff master...otherbranch	Changes in master since otherbranch was branched from it
 
+If you want to see the diff between files that changed names, or exist in different branches with different
+names, or just the diff between different files in different commits, it's all possible. 
+	$ git diff branch1:filename1.txt branch2:filename2.txt
+	$ git diff commit1:filename1.txt commit2:filename2.txt
+
 Friendlier outputs/summaries:
 	$ git diff --stat		Create a histogram showing insertions, deletions
 	$ git diff --name-status	Only show names and changes, not diff output
@@ -477,3 +481,73 @@ during the specified commit.
 In addition to basic git diffs, there are "raw output" diffs, including git-diff-index, git-diff-tree, and
 git-diff-files. These show raw (computer-friendly), and provide a speed boost, but otherwise aren't too different
 from standard git-diff. 
+
+
+===========================
+========= UNDO ============
+===========================
+The commands useful for 'undo' in git are:
+	git reset		Undo local changes, staging
+	git revert		Undo changes publicly (with commits)
+	git checkout	Force change of working tree
+	git stash		Store current state during risky manouevers
+
+Git-reset is the safest way to undo git-related actions, because you have to explicitly tell it whether or not to
+change the working tree and the index. Really, git-reset moves the HEAD to a given commit, and it may or may not
+update your working tree and index to match. The five modes are:
+	$ git reset --soft		Reset the HEAD only, doesn't change the working tree or index
+	$ git reset --mixed		Reset the HEAD and change the index to match (unstage changes), working tree is
+							untouched. Default behavior.
+	$ git reset --hard		Reset the HEAD, change index and working tree to match.
+	$ git reset --merge		Resets HEAD, changes the index, updates files different between the commit and HEAD,
+							but keeps any unstaged changes. Aborts if a file is different and staged. 
+	$ git reset --keep		Reset HEAD, change index, update files that are different. 
+
+Some examples:
+	$ git reset --soft oldcommit	Reset HEAD to oldcommit, but otherwise don't change anything
+	$ git reset						Reset the index to match previous commit, don't change any files
+	$ git reset --soft HEAD^		Go back to previous commit, keep files. Useful for fixing an incomplete
+									commit.
+	$ git reset --hard HEAD~3		Update working tree and index to match third previous commit. No going back.
+	$ git reset --hard				Clean index and working tree to match most recent commit
+
+After a git-reset, the original head is stored by git as ORIG_HEAD. So for example, if you made a mistake in the
+most recent commit, you can do a soft reset, then re-commit using the original head meta-data. 
+	$ git reset --soft HEAD^
+	$ git commit -a -C ORIG_HEAD	Commit all changes using the message from the original commit
+
+Note that when resetting, the HEAD is not detached. After resetting, previous commits are removed from the
+branch. You can still recover them, however, using the git reference log (reflog), or (for git reset HEAD~)
+simply using ORIG_HEAD. This is equivalent to HEAD@{1}, and to go further back, you can use HEAD@{2}, HEAD@{3},
+etc. 
+
+Note that there's no way for git to reset the working tree changes without changing the index. This is necessary
+to e.g. undo unstaged changes. For changes to the working tree, we need to use git-checkout. 
+
+Git-checkout applies to files, branches, and commits. In general, checking out will update a specified file to a
+previous version. This can be from the index, from the most recent commit, from a separate branch, from older
+commits, etc. If a particular file is specified, HEAD doesn't change. If no files or paths are specified, HEAD is
+moved to wherever you checked out.
+
+	$ git checkout oldcommit -- localfile	Replace localfile with the version from oldcommit
+	$ git checkout stagedfile				Replace stagedfile with the version in the index (unstaged changes
+											are removed, staged changes are safe)
+	$ git checkout .						Update working tree from the index (unstaged changes are removed,
+											staged changes are safe)
+
+
+==============================
+==== DISPLAYING GIT ITEMS ====
+==============================
+There are very nice ways to display git information. This is a short reference for these sorts of things. 
+	$ git log -1
+	$ git log --graph
+	$ git log --oneline
+	$ git reflog
+	$ git revlist -g --all
+	$ git show
+	$ git status
+	$ git log --graph --decorate --oneline --date=short		Show tree of commits, see git log documentation
+	$ git diff --stat			Create a histogram showing insertions, deletions
+	$ git diff --name-status	Only show names and changes, not diff output
+
